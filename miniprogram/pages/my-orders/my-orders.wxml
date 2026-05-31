@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="order-card" wx:for="{{orderList}}" wx:key="_id" bindtap="goToOrder" data-id="{{item._id}}">
+    <view class="order-info">
+      <text class="order-title">{{item.itemTitle}}</text>
+      <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
+    </view>
+    <view class="order-right">
+      <view class="status-tag {{item.status}}">
+        {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已归还')}}
+      </view>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{isEmpty}}">
+    <text class="empty-text">还没有租借记录</text>
+    <button class="empty-btn" bindtap="goToIndex">去逛逛</button>
+  </view>
+</view>

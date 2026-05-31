@@ -1,0 +1,61 @@
+<view class="page-wrapper">
+  <image class="bg-image" src="/images/sysu1.jpg" mode="aspectFill"></image>
+  <view class="bg-overlay"></view>
+
+  <view class="content-container">
+    <!-- Category Filter Bar -->
+    <scroll-view class="category-scroll" scroll-x="true" show-scrollbar="false" enhanced="true">
+      <view class="category-list">
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="*this" 
+          class="category-item {{activeCategory === item ? 'active' : ''}}"
+          bindtap="switchCategory" 
+          data-category="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Search Bar -->
+    <view class="search-bar-container">
+      <view class="search-bar">
+        <view class="search-icon"></view>
+        <input 
+          class="search-input" 
+          placeholder="搜索物品名称..." 
+          placeholder-class="search-placeholder"
+          bindinput="onSearchInput" 
+          value="{{searchText}}"
+        />
+      </view>
+    </view>
+
+    <!-- Item List -->
+    <view class="item-list" wx:if="{{itemList.length > 0}}">
+      <view class="item-card" wx:for="{{itemList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}" hover-class="card-hover">
+        <image src="{{item.image}}" mode="aspectFill" class="item-img"></image>
+        <view class="item-info">
+          <view class="item-header">
+            <text class="title">{{item.title}}</text>
+            <text class="tag">{{item.category}}</text>
+          </view>
+          <view class="item-footer">
+            <text class="price-rent"><text class="price-symbol">¥</text>{{item.rentPrice}}<text class="price-unit">/天</text></text>
+            <text class="price-deposit">押金¥{{item.deposit}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty State -->
+    <view class="empty-state" wx:else>
+      <view class="empty-icon-box">
+        <view class="empty-icon"></view>
+      </view>
+      <text class="empty-text">暂无可租借物品</text>
+      <text class="empty-subtext">快来发布第一件物品吧~</text>
+    </view>
+  </view>
+</view>

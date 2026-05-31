@@ -1,0 +1,49 @@
+<view class="container">
+  <image src="{{item.image}}" class="header-img"></image>
+  <view class="info-card">
+    <view class="title">{{item.title}}</view>
+    <view class="price-wrap">
+      <text>日租：￥{{item.rentPrice}}</text>
+      <text class="deposit {{isVerified ? 'waived' : ''}}">
+        押金：￥{{item.deposit}} {{isVerified ? '(已认证，免押金)' : ''}}
+      </text>
+    </view>
+  </view>
+
+  <view class="calendar-card">
+    <view class="cal-header">
+      <view class="cal-title">{{currentMonth}}</view>
+      <view class="cal-status">已选：{{startDate || '—'}} 至 {{endDate || '—'}}</view>
+    </view>
+
+    <!-- 星期标题行 -->
+    <view class="weekday-row">
+      <view class="weekday" wx:for="{{weekDays}}" wx:key="*this" wx:for-index="wi">
+        <text class="{{wi >= 5 ? 'weekend-header' : ''}}">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 日历网格 -->
+    <view class="days-grid">
+      <view
+        wx:for="{{calendar}}"
+        wx:key="index"
+        class="day-box {{item.empty ? 'empty-cell' : ''}} {{item.disabled ? 'disabled' : ''}} {{item.selected ? 'selected' : ''}} {{item.isWeekend ? 'weekend' : ''}}"
+        bindtap="selectDate"
+        data-index="{{index}}"
+      >
+        <text class="date-txt" wx:if="{{!item.empty}}">{{item.day}}</text>
+      </view>
+    </view>
+
+    <view class="cal-legend">
+      <view class="legend-item"><view class="legend-dot free"></view><text>可选</text></view>
+      <view class="legend-item"><view class="legend-dot taken"></view><text>已借出</text></view>
+      <view class="legend-item"><view class="legend-dot picked"></view><text>已选择</text></view>
+    </view>
+
+    <button class="reset-btn" bindtap="resetDates">重新选择</button>
+  </view>
+
+  <button type="primary" class="book-btn" bindtap="bookItem">预约并生成交接单</button>
+</view>

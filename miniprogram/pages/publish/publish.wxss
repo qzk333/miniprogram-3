@@ -1,0 +1,222 @@
+/* 页面背景和布局容器 */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.bg-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+}
+
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(248, 249, 250, 0);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: -1;
+}
+
+/* 全局页面容器 */
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+/* 基础表单卡片 & 图片上传卡片 */
+.form-card, .upload-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 10rpx 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02); /* 柔和阴影 */
+  box-sizing: border-box;
+}
+
+/* 表单单条容器 */
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid #F2F4F7;
+  box-sizing: border-box;
+}
+
+.form-item.no-border {
+  border-bottom: none; /* 最后一项去掉下划线 */
+}
+
+/* 左侧标签：固定宽度，使右侧输入区域在垂直方向上完美对齐 */
+.form-label {
+  font-size: 28rpx;
+  color: #2D3748;
+  font-weight: 500;
+  width: 160rpx; 
+  flex-shrink: 0;
+}
+
+/* 右侧输入框：直接输入 */
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #1A202C;
+  height: 80rpx;
+}
+
+/* 租金、押金输入右对齐（更符合金额填写习惯） */
+.align-right {
+  text-align: right;
+  padding-right: 12rpx;
+}
+
+.placeholder-style {
+  color: #A0AEC0;
+  font-size: 28rpx;
+}
+
+/* 输入框后的单位包装 */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.unit-text {
+  font-size: 26rpx;
+  color: #718096;
+  flex-shrink: 0;
+}
+
+/* 分类 Picker 组件布局 */
+.form-picker {
+  flex: 1;
+  height: 100rpx;
+}
+
+.picker-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 占满右侧空间 */
+  height: 100rpx;
+}
+
+.picker-text {
+  font-size: 28rpx;
+  color: #1A202C;
+}
+
+.picker-placeholder {
+  font-size: 28rpx;
+  color: #A0AEC0;
+}
+
+/* CSS绘制的右侧下拉箭头 */
+.arrow-icon {
+  width: 12rpx;
+  height: 12rpx;
+  border-top: 3rpx solid #A0AEC0;
+  border-right: 3rpx solid #A0AEC0;
+  transform: rotate(45deg); /* 旋转形成箭头 */
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+
+/* 图片上传卡片内部 */
+.upload-card {
+  padding: 30rpx;
+}
+
+.upload-title {
+  font-size: 28rpx;
+  color: #2D3748;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 24rpx;
+}
+
+/* 图形化的上传方框（1:1 比例） */
+.upload-box {
+  width: 350rpx;
+  height: 350rpx;
+  border: 2rpx dashed #CBD5E0;
+  border-radius: 12rpx;
+  background: #F7FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 未上传时的加号及提示 */
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plus-icon {
+  font-size: 44rpx;
+  color: #A0AEC0;
+  line-height: 1;
+  margin-bottom: 6rpx;
+}
+
+.upload-text {
+  font-size: 20rpx;
+  color: #A0AEC0;
+}
+
+/* 已上传时的预览图 */
+.preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 图片底部半透明的更换提示条 */
+.re-upload-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.4);
+  color: #FFFFFF;
+  font-size: 18rpx;
+  text-align: center;
+  padding: 6rpx 0;
+}
+
+/* 发布物品按钮：圆角药丸形状，使用标准中大绿，加入轻微呼吸投影 */
+.submit-btn {
+  width: 100% !important;
+  height: 92rpx;
+  line-height: 92rpx;
+  background: #00521e !important; /* 经典中大绿 */
+  color: #FFFFFF !important;
+  font-size: 32rpx;
+  font-weight: 500;
+  border-radius: 46rpx; /* 圆角药丸化 */
+  margin-top: 50rpx;
+  padding: 0;
+  box-shadow: 0 8rpx 24rpx rgba(0, 86, 31, 0.15); /* 绿色发光阴影 */
+  border: none;
+}
+
+/* 点击按钮时的反馈反馈效果 */
+.submit-btn:active {
+  opacity: 0.9;
+}

@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="order-info">
+    <view class="title">物品：{{order.itemTitle}}</view>
+    <view>借用期限：{{order.startDate}} 至 {{order.endDate}}</view>
+    <view>当前状态：{{order.status == 'pending' ? '待面交' : (order.status == 'active' ? '借用中' : '已归还')}}</view>
+  </view>
+
+  <!-- 面交环节 -->
+  <view class="action-card" wx:if="{{order.status == 'pending'}}">
+    <view class="step-title">第一步：面交验机拍照</view>
+    <view class="desc">请双方当面确认物品完好，并拍下细节图存证。</view>
+    <button bindtap="uploadHandoverPhotos">上传面交照片</button>
+    <image wx:if="{{order.handoverImage}}" src="{{order.handoverImage}}" class="proof-img"></image>
+    <button type="primary" wx:if="{{order.handoverImage}}" bindtap="confirmHandover">确认交接完毕</button>
+  </view>
+
+  <!-- 归还环节 -->
+  <view class="action-card" wx:if="{{order.status == 'active'}}">
+    <view class="step-title">第二步：归还验机拍照</view>
+    <view class="desc">归还时拍照确认物品无损，退还押金。</view>
+    <button bindtap="uploadReturnPhotos">上传归还照片</button>
+    <image wx:if="{{order.returnImage}}" src="{{order.returnImage}}" class="proof-img"></image>
+    <button type="primary" wx:if="{{order.returnImage}}" bindtap="confirmReturn">确认归还，结束订单</button>
+  </view>
+</view>

@@ -1,0 +1,406 @@
+/* 页面背景和布局容器 */
+.page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.bg-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+}
+
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(248, 249, 250, 0); /* 半透明白色遮罩，保证卡片可读性 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: -1;
+}
+
+.container {
+  padding: 30rpx;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= 动画 ================= */
+.fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20rpx);
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-hover {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* ================= 登录区域 ================= */
+.login-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100rpx;
+}
+
+.login-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24rpx;
+  padding: 80rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.login-card .avatar {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: #EDF2F7;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+.login-tip {
+  font-size: 28rpx;
+  color: #718096;
+  margin: 40rpx 0 60rpx 0;
+}
+.login-btn {
+  width: 440rpx !important;
+  height: 90rpx;
+  line-height: 90rpx;
+  background: #00561F !important; /* 中大标准绿 */
+  color: #FFFFFF !important;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 45rpx;
+  padding: 0;
+  box-shadow: 0 8rpx 20rpx rgba(0, 86, 31, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* ================= 用户资料卡片 ================= */
+.profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16rpx;
+  padding: 60rpx 40rpx 50rpx 40rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
+}
+.avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.avatar {
+  width: 170rpx;
+  height: 170rpx;
+  border-radius: 50%;
+  background: #EDF2F7;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.03);
+}
+
+/* 更换头像：设计为精致的轻量灰色胶囊 */
+.avatar-btn {
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #64748B;
+  background: #F1F5F9 !important;
+  border-radius: 24rpx;
+  padding: 6rpx 20rpx !important;
+  line-height: 1.4 !important;
+  border: none !important;
+  width: auto !important;
+  display: inline-block !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.avatar-btn::after {
+  border: none;
+}
+
+/* 昵称输入区 */
+.nickname-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24rpx;
+}
+.nickname-input {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1A202C;
+  text-align: center;
+  width: auto;
+  min-width: 120rpx;
+  max-width: 400rpx;
+}
+.edit-pencil {
+  font-size: 28rpx;
+  color: #A0AEC0;
+  margin-left: 10rpx;
+  transform: translateY(-2rpx);
+}
+.placeholder-style {
+  color: #CBD5E0;
+  font-size: 30rpx;
+}
+
+/* 认证状态胶囊 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10rpx 28rpx;
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-top: 28rpx;
+}
+/* 通过认证：中大绿背景与文字 */
+.status-badge.verified {
+  background: rgba(0, 86, 31, 0.08);
+  color: #00561F;
+}
+/* 未通过认证 */
+.status-badge.unverified {
+  background: #FFF5F5;
+  color: #E53E3E;
+}
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+.verified .status-dot {
+  background: #00561F;
+}
+.unverified .status-dot {
+  background: #E53E3E;
+}
+
+/* ================= 用户数据统计 ================= */
+.stats-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16rpx;
+  padding: 40rpx 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #00561F;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #718096;
+}
+
+.stat-divider {
+  width: 2rpx;
+  height: 60rpx;
+  background: #E2E8F0;
+}
+
+/* ================= 快捷入口 ================= */
+.quick-actions-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #F1F5F9;
+  transition: all 0.3s ease;
+}
+
+.action-item:last-child {
+  border-bottom: none;
+  padding-bottom: 10rpx;
+}
+.action-item:first-child {
+  padding-top: 10rpx;
+}
+
+.action-hover {
+  opacity: 0.7;
+  transform: translateX(4rpx);
+}
+
+.action-name {
+  font-size: 30rpx;
+  color: #2D3748;
+  font-weight: 500;
+}
+
+.action-arrow {
+  width: 14rpx;
+  height: 14rpx;
+  border-top: 4rpx solid #CBD5E0;
+  border-right: 4rpx solid #CBD5E0;
+  transform: rotate(45deg);
+}
+
+/* ================= 认证区域卡片通用 ================= */
+.auth-box, .verified-info {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.02);
+  margin-bottom: 30rpx;
+}
+
+/* 带有左侧修饰小竖条的卡片标题 */
+.card-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 36rpx;
+}
+.title-decorator {
+  width: 8rpx;
+  height: 32rpx;
+  background: #00561F; /* 中大绿竖条 */
+  border-radius: 4rpx;
+  margin-right: 16rpx;
+}
+.card-title text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A202C;
+}
+
+/* ================= 邮箱认证输入 ================= */
+.input {
+  border: 1rpx solid #E2E8F0;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 28rpx;
+  background: #F8FAFC; /* 轻量输入框底色 */
+  color: #2D3748;
+}
+/* 邮箱验证码行 */
+.code-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 36rpx;
+}
+.code-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+/* 获取验证码按钮 */
+.send-btn {
+  width: 220rpx !important;
+  font-size: 26rpx !important;
+  font-weight: 500 !important;
+  background: rgba(0, 86, 31, 0.08) !important;
+  color: #00561F !important;
+  border-radius: 12rpx !important;
+  flex-shrink: 0;
+  height: 90rpx;
+  line-height: 90rpx !important;
+  padding: 0 !important;
+  border: none;
+  transition: all 0.3s ease;
+}
+.send-btn[disabled] {
+  background: #EDF2F7 !important;
+  color: #A0AEC0 !important;
+}
+/* 提交认证按钮 */
+.submit-auth-btn {
+  width: 100% !important;
+  height: 90rpx;
+  line-height: 90rpx;
+  background: #00561F !important;
+  color: #FFFFFF !important;
+  font-size: 30rpx;
+  font-weight: 500;
+  border-radius: 45rpx;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+/* ================= 已认证信息 ================= */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F1F5F9;
+}
+.info-item:last-child {
+  border-bottom: none; /* 最后一项去除下划线 */
+}
+.info-label {
+  font-size: 28rpx;
+  color: #718096;
+}
+.info-value {
+  font-size: 28rpx;
+  color: #2D3748;
+  font-weight: 500;
+}
+/* 高亮展示免押金特权 */
+.info-value.highlight {
+  color: #00561F;
+  font-weight: 600;
+}

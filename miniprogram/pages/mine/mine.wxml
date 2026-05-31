@@ -1,0 +1,114 @@
+<view class="page-wrapper">
+  <!-- 全局背景 -->
+  <image class="bg-image" src="/images/sysu1.jpg" mode="aspectFill"></image>
+  <view class="bg-overlay"></view>
+
+  <view class="container">
+    <!-- 未登录：显示登录入口 -->
+    <view class="login-section" wx:if="{{!isLoggedIn}}">
+      <view class="login-card fade-in-up">
+        <image class="avatar" src="/images/avatar.png"></image>
+        <view class="login-tip">登录后即可进行租借操作</view>
+        <button class="login-btn" bindtap="login" hover-class="btn-hover">微信一键登录</button>
+      </view>
+    </view>
+
+    <!-- 已登录：显示用户信息和认证状态 -->
+    <view wx:else class="logged-in-section">
+      <!-- 用户资料卡片 -->
+      <view class="profile-card fade-in-up">
+        <view class="avatar-wrap">
+          <image class="avatar" src="{{userInfo.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"></image>
+          <!-- 头像更换按钮：微调为无框轻量胶囊 -->
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" hover-class="btn-hover">
+            更换头像
+          </button>
+        </view>
+        
+        <!-- 昵称区域：点缀可修改铅笔标志 -->
+        <view class="nickname-wrap">
+          <input
+            class="nickname-input"
+            type="nickname"
+            value="{{userInfo.nickName}}"
+            placeholder="点击设置昵称"
+            placeholder-class="placeholder-style"
+            bindblur="onNicknameBlur"
+          />
+          <text class="edit-pencil">✎</text>
+        </view>
+        
+        <!-- 认证徽章：使用胶囊点亮设计 -->
+        <view class="status-badge {{isVerified ? 'verified' : 'unverified'}}">
+          <view class="status-dot"></view>
+          <text>{{isVerified ? '中大校园认证已通过' : '未校园认证（认证免押金）'}}</text>
+        </view>
+      </view>
+
+      <!-- 用户数据统计 -->
+      <view class="stats-card fade-in-up delay-1">
+        <view class="stat-item">
+          <text class="stat-num">{{publishedCount || 0}}</text>
+          <text class="stat-label">已发布</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-num">{{activeOrdersCount || 0}}</text>
+          <text class="stat-label">进行中</text>
+        </view>
+      </view>
+
+      <!-- 快捷入口 -->
+      <view class="quick-actions-card fade-in-up delay-2">
+        <view class="card-title">
+          <view class="title-decorator"></view>
+          <text>快捷入口</text>
+        </view>
+        <view class="action-list">
+          <view class="action-item" hover-class="action-hover" bindtap="goToMyPublish">
+            <view class="action-name">我的发布</view>
+            <view class="action-arrow"></view>
+          </view>
+          <view class="action-item" hover-class="action-hover" bindtap="goToMyOrders">
+            <view class="action-name">我的租借</view>
+            <view class="action-arrow"></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 邮箱认证区域 (未认证时显示) -->
+      <view class="auth-box fade-in-up delay-3" wx:if="{{!isVerified}}">
+        <view class="card-title">
+          <view class="title-decorator"></view>
+          <text>校园邮箱认证</text>
+        </view>
+        <input class="input" placeholder="输入中大邮箱 (例: xx@mail2.sysu.edu.cn)" placeholder-class="placeholder-style" value="{{email}}" bindinput="inputEmail" />
+        <view class="code-row">
+          <input class="input code-input" placeholder="输入6位验证码" placeholder-class="placeholder-style" bindinput="inputCode" />
+          <button class="send-btn" bindtap="sendCode" disabled="{{isSending}}" hover-class="btn-hover">{{isSending ? '发送中' : '获取验证码'}}</button>
+        </view>
+        <button class="submit-auth-btn" bindtap="verifyCode" hover-class="btn-hover">提交认证</button>
+      </view>
+
+      <!-- 已认证信息 (已认证时显示) -->
+      <view class="verified-info fade-in-up delay-3" wx:if="{{isVerified}}">
+        <view class="card-title">
+          <view class="title-decorator"></view>
+          <text>认证信息</text>
+        </view>
+        
+        <!-- 两端分散对齐的参数列表，更显整洁 -->
+        <view class="info-list">
+          <view class="info-item">
+            <text class="info-label">关联邮箱</text>
+            <text class="info-value">{{verifiedEmail || 'qiuzk5@mail2.sysu.edu.cn'}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">租借特权</text>
+            <text class="info-value highlight">已激活免押金特权</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/publish/publish",
+    "pages/mine/mine",
+    "pages/detail/detail",
+    "pages/order/order",
+    "pages/my-publish/my-publish",
+    "pages/my-orders/my-orders"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "校园借借",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/publish/publish",
+        "text": "发布",
+        "iconPath": "images/examples.png",
+        "selectedIconPath": "images/examples-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/avatar.png",
+        "selectedIconPath": "images/avatar-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}
