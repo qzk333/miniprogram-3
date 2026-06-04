@@ -67,6 +67,27 @@
   color: #CBD5E0;
 }
 
+.order-card.highlight {
+  border: 2rpx solid #00561F;
+  box-shadow: 0 4rpx 20rpx rgba(0, 86, 31, 0.15);
+}
+
+.action-btn {
+  margin: 0;
+  padding: 0 24rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 24rpx;
+  background: #00561F !important;
+  color: #fff !important;
+  border-radius: 28rpx;
+  border: none;
+}
+
+.action-btn::after {
+  border: none;
+}
+
 .empty {
   display: flex;
   flex-direction: column;

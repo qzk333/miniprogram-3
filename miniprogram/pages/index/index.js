@@ -8,7 +8,30 @@ Page({
     searchText: ''
   },
   onShow() {
-    this.fetchItems()
+    this.fetchItems();
+    this.showPendingOrderTip();
+  },
+
+  /** 预约成功后从详情返回首页时弹出一次性引导 */
+  showPendingOrderTip() {
+    const app = getApp();
+    const tip = app.globalData.pendingOrderTip;
+    if (!tip) return;
+    app.globalData.pendingOrderTip = null;
+
+    const dateRange = `${tip.startDate} 至 ${tip.endDate}`;
+    wx.showModal({
+      title: '预约成功',
+      content: `「${tip.itemTitle}」\n${dateRange}\n\n面交时请打开「我的 → 我的租借」上传凭证并确认交接。`,
+      confirmText: '我的租借',
+      cancelText: '继续逛逛',
+      success: (res) => {
+        if (res.confirm) {
+          const q = tip.orderId ? `?highlight=${tip.orderId}` : '';
+          wx.navigateTo({ url: `/pages/my-orders/my-orders${q}` });
+        }
+      },
+    });
   },
   fetchItems() {
     // 从云数据库拉取物品数据

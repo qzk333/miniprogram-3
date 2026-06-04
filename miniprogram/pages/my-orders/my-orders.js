@@ -3,7 +3,17 @@ const db = wx.cloud.database();
 Page({
   data: {
     orderList: [],
-    isEmpty: false
+    isEmpty: false,
+    highlightOrderId: '',
+  },
+
+  onLoad(options) {
+    if (options.highlight) {
+      this.setData({ highlightOrderId: options.highlight });
+      setTimeout(() => {
+        this.setData({ highlightOrderId: '' });
+      }, 3000);
+    }
   },
 
   onShow() {
@@ -13,7 +23,7 @@ Page({
   fetchMyOrders() {
     const openid = getApp().globalData.openid;
     if (!openid) {
-      this.setData({ isEmpty: true });
+      this.setData({ orderList: [], isEmpty: true });
       return;
     }
     wx.showLoading({ title: '加载中' });
@@ -21,11 +31,11 @@ Page({
       .where({ borrowerOpenid: openid })
       .orderBy('createTime', 'desc')
       .get()
-      .then(res => {
+      .then((res) => {
         wx.hideLoading();
         this.setData({
           orderList: res.data,
-          isEmpty: res.data.length === 0
+          isEmpty: res.data.length === 0,
         });
       })
       .catch(() => {
@@ -36,10 +46,11 @@ Page({
 
   goToOrder(e) {
     const id = e.currentTarget.dataset.id;
-    wx.navigateTo({ url: '/pages/order/order?id=' + id });
+    if (!id) return;
+    wx.navigateTo({ url: `/pages/order/order?id=${id}` });
   },
 
   goToIndex() {
     wx.switchTab({ url: '/pages/index/index' });
-  }
+  },
 });

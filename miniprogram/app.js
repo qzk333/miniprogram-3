@@ -1,10 +1,12 @@
 // app.js
 App({
   globalData: {
-    env: 'cloud1-d7gf8up0j9a103b37',
+    env: 'cloud1-0gaxhtt078d18f40',
     isLoggedIn: false,
     openid: '',
-    userInfo: null
+    userInfo: null,
+    /** 预约成功后一次性提示，首页 onShow 消费后清空 */
+    pendingOrderTip: null,
   },
 
   onLaunch: function () {

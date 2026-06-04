@@ -168,10 +168,18 @@ Page({
       },
       success: (res) => {
         wx.hideLoading();
-        wx.showToast({ title: '预约成功' });
-        setTimeout(() => {
-          wx.navigateTo({ url: `/pages/order/order?id=${res._id}` });
-        }, 1000);
+        const app = getApp();
+        app.globalData.pendingOrderTip = {
+          orderId: res._id,
+          itemTitle: this.data.item.title,
+          startDate: this.data.startDate,
+          endDate: this.data.endDate,
+        };
+        wx.switchTab({ url: '/pages/index/index' });
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({ title: '预约失败，请重试', icon: 'none' });
       },
     });
   },

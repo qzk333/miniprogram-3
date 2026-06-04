@@ -88,12 +88,21 @@
   /* 空占位格不可见 */
 }
 
+/* 已借出：灰色背景块，与图例 .legend-dot.taken 一致 */
 .disabled {
-  color: #ccc;
+  background: #ececec;
+  border-color: #dcdcdc;
+  color: #8a8a8a;
 }
 
 .disabled .date-txt {
-  color: #ccc;
+  color: #8a8a8a;
+  font-weight: 500;
+}
+
+/* 已借出的周末不再用红色，避免与「不可选」状态混淆 */
+.disabled.weekend .date-txt {
+  color: #8a8a8a;
 }
 
 .selected {

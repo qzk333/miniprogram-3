@@ -1,14 +1,32 @@
 <view class="container">
-  <view class="order-card" wx:for="{{orderList}}" wx:key="_id" bindtap="goToOrder" data-id="{{item._id}}">
+  <view
+    class="order-card {{highlightOrderId === item._id ? 'highlight' : ''}}"
+    wx:for="{{orderList}}"
+    wx:key="_id"
+    bindtap="goToOrder"
+    data-id="{{item._id}}"
+  >
     <view class="order-info">
       <text class="order-title">{{item.itemTitle}}</text>
       <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
     </view>
     <view class="order-right">
       <view class="status-tag {{item.status}}">
-        {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已归还')}}
+        {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束')}}
       </view>
-      <view class="arrow">›</view>
+      <button
+        wx:if="{{item.status === 'pending'}}"
+        class="action-btn"
+        catchtap="goToOrder"
+        data-id="{{item._id}}"
+      >去面交</button>
+      <button
+        wx:elif="{{item.status === 'active'}}"
+        class="action-btn"
+        catchtap="goToOrder"
+        data-id="{{item._id}}"
+      >去归还</button>
+      <view wx:else class="arrow">›</view>
     </view>
   </view>
 
