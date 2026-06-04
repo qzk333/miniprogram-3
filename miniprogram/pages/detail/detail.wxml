@@ -1,5 +1,5 @@
 <view class="container">
-  <image src="{{item.image}}" class="header-img"></image>
+  <image src="{{item.image}}" class="header-img" wx:if="{{item.image}}"></image>
   <view class="info-card">
     <view class="title">{{item.title}}</view>
     <view class="price-wrap">
@@ -7,6 +7,47 @@
       <text class="deposit {{isVerified ? 'waived' : ''}}">
         押金：￥{{item.deposit}} {{isVerified ? '(已认证，免押金)' : ''}}
       </text>
+    </view>
+    <view class="desc-block" wx:if="{{item.description}}">
+      <text class="desc-label">物品说明</text>
+      <text class="desc-text">{{item.description}}</text>
+    </view>
+  </view>
+
+  <view class="contact-card" wx:if="{{item.contactWechat || item.contactQQ}}">
+    <view class="section-title">联系出借方</view>
+    <view class="contact-row" wx:if="{{item.contactWechat}}">
+      <text class="contact-label">微信</text>
+      <text class="contact-value">{{item.contactWechat}}</text>
+      <button class="copy-btn" size="mini" bindtap="copyContact" data-type="wechat">复制</button>
+    </view>
+    <view class="contact-row" wx:if="{{item.contactQQ}}">
+      <text class="contact-label">QQ</text>
+      <text class="contact-value">{{item.contactQQ}}</text>
+      <button class="copy-btn" size="mini" bindtap="copyContact" data-type="qq">复制</button>
+    </view>
+  </view>
+
+  <view class="comment-card">
+    <view class="section-title">物品交流区</view>
+    <view class="comment-list" wx:if="{{comments.length > 0}}">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="_id">
+        <view class="comment-meta">
+          <text class="comment-author">{{item.authorNickname}}</text>
+        </view>
+        <text class="comment-content">{{item.content}}</text>
+      </view>
+    </view>
+    <view class="comment-empty" wx:else>暂无评论，可留言咨询物品情况</view>
+    <view class="comment-input-row">
+      <input
+        class="comment-input"
+        placeholder="咨询物品细节、面交地点等"
+        maxlength="200"
+        value="{{commentInput}}"
+        bindinput="onCommentInput"
+      />
+      <button class="comment-send" size="mini" bindtap="submitComment">发送</button>
     </view>
   </view>
 
@@ -16,14 +57,16 @@
       <view class="cal-status">已选：{{startDate || '—'}} 至 {{endDate || '—'}}</view>
     </view>
 
-    <!-- 星期标题行 -->
+    <view class="rent-estimate" wx:if="{{rentDays > 0}}">
+      <text>约 {{rentDays}} 天 × ￥{{item.rentPrice}}/天 ≈ ￥{{rentTotal}}（租金面交结算）</text>
+    </view>
+
     <view class="weekday-row">
       <view class="weekday" wx:for="{{weekDays}}" wx:key="*this" wx:for-index="wi">
         <text class="{{wi >= 5 ? 'weekend-header' : ''}}">{{item}}</text>
       </view>
     </view>
 
-    <!-- 日历网格 -->
     <view class="days-grid">
       <view
         wx:for="{{calendar}}"

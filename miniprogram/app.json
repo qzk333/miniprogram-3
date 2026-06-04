@@ -6,7 +6,8 @@
     "pages/detail/detail",
     "pages/order/order",
     "pages/my-publish/my-publish",
-    "pages/my-orders/my-orders"
+    "pages/my-orders/my-orders",
+    "pages/my-received/my-received"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

@@ -1,0 +1,7 @@
+@import "../my-orders/my-orders.wxss";
+
+.order-role {
+  font-size: 22rpx;
+  color: #A0AEC0;
+  margin-top: 4rpx;
+}

@@ -56,6 +56,7 @@
       </view>
       <text class="empty-text">暂无可租借物品</text>
       <text class="empty-subtext">快来发布第一件物品吧~</text>
+      <button class="empty-publish-btn" bindtap="goToPublish">去发布</button>
     </view>
   </view>
 </view>

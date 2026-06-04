@@ -17,6 +17,9 @@ Page({
       '其他',
     ],
     imageUrl: '',
+    description: '',
+    contactWechat: '',
+    contactQQ: '',
   },
   onShow() {
     // 每次进入发布页时检查登录状态
@@ -43,6 +46,15 @@ Page({
   },
   inputDeposit(e) {
     this.setData({ deposit: e.detail.value });
+  },
+  inputDescription(e) {
+    this.setData({ description: e.detail.value });
+  },
+  inputWechat(e) {
+    this.setData({ contactWechat: e.detail.value });
+  },
+  inputQQ(e) {
+    this.setData({ contactQQ: e.detail.value });
   },
   onCategoryChange(e) {
     const index = e.detail.value;
@@ -96,13 +108,26 @@ Page({
         deposit: this.data.deposit,
         category: this.data.category,
         image: this.data.imageUrl,
+        description: this.data.description.trim(),
+        contactWechat: this.data.contactWechat.trim(),
+        contactQQ: this.data.contactQQ.trim(),
         publisherOpenid: app.globalData.openid,
         createTime: db.serverDate(),
       },
       success: () => {
         wx.hideLoading();
         wx.showToast({ title: '发布成功' });
-        this.setData({ title: '', rentPrice: '', deposit: '', category: '', imageUrl: '' });
+        this.setData({
+          title: '',
+          rentPrice: '',
+          deposit: '',
+          category: '数码电子',
+          categoryIndex: 0,
+          imageUrl: '',
+          description: '',
+          contactWechat: '',
+          contactQQ: '',
+        });
         setTimeout(() => {
           wx.switchTab({ url: '/pages/index/index' });
         }, 1500);

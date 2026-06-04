@@ -280,6 +280,20 @@
   font-size: 30rpx;
   color: #2D3748;
   font-weight: 500;
+  flex: 1;
+}
+
+.action-badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  padding: 0 10rpx;
+  margin-right: 16rpx;
+  font-size: 22rpx;
+  text-align: center;
+  color: #fff;
+  background: #E53E3E;
+  border-radius: 18rpx;
 }
 
 .action-arrow {

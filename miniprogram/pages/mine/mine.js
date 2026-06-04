@@ -10,6 +10,7 @@ Page({
     isSending: false,
     publishedCount: 0,
     activeOrdersCount: 0,
+    receivedOrdersCount: 0,
   },
 
   onShow() {
@@ -117,11 +118,31 @@ Page({
     db.collection('orders')
       .where({
         borrowerOpenid: openid,
-        status: _.in(['pending', 'active'])
+        status: _.in(['pending', 'active']),
       })
       .count()
-      .then(res => {
+      .then((res) => {
         this.setData({ activeOrdersCount: res.total });
+      })
+      .catch(() => {});
+    db.collection('items')
+      .where({ publisherOpenid: openid })
+      .field({ _id: true })
+      .get()
+      .then((itemsRes) => {
+        const itemIds = itemsRes.data.map((i) => i._id);
+        const cond = itemIds.length
+          ? _.or([{ publisherOpenid: openid }, { itemId: _.in(itemIds) }])
+          : { publisherOpenid: openid };
+        return db
+          .collection('orders')
+          .where(
+            _.and([cond, { status: _.in(['pending', 'active']) }])
+          )
+          .count();
+      })
+      .then((res) => {
+        this.setData({ receivedOrdersCount: res.total });
       })
       .catch(() => {});
   },
@@ -134,6 +155,13 @@ Page({
   // 导航到我的租借
   goToMyOrders() {
     wx.navigateTo({ url: '/pages/my-orders/my-orders' });
+  },
+
+  goToMyReceived() {
+    const app = getApp();
+    app.requireLogin(() => {
+      wx.navigateTo({ url: '/pages/my-received/my-received' });
+    });
   },
 
   // --- 头像和昵称编辑（新版微信 API） ---

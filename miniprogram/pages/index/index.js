@@ -34,17 +34,25 @@ Page({
     });
   },
   fetchItems() {
-    // 从云数据库拉取物品数据
-    db.collection('items').orderBy('createTime', 'desc').get({
-      success: res => {
-        this.setData({ allItems: res.data }, () => {
-          this.applyFilter();
-        });
-      },
-      fail: err => {
-        console.error('Fetch items failed', err);
-      }
-    })
+    wx.showLoading({ title: '加载中' });
+    db.collection('items')
+      .orderBy('createTime', 'desc')
+      .get({
+        success: (res) => {
+          wx.hideLoading();
+          this.setData({ allItems: res.data }, () => {
+            this.applyFilter();
+          });
+        },
+        fail: () => {
+          wx.hideLoading();
+          wx.showToast({ title: '加载失败，请下拉重试', icon: 'none' });
+        },
+      });
+  },
+
+  goToPublish() {
+    wx.switchTab({ url: '/pages/publish/publish' });
   },
   switchCategory(e) {
     const category = e.currentTarget.dataset.category;

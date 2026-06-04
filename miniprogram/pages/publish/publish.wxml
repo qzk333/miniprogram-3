@@ -33,12 +33,34 @@
     </view>
 
     <!-- 押金 -->
-    <view class="form-item no-border">
+    <view class="form-item">
       <text class="form-label">线下押金</text>
       <view class="input-wrapper">
-        <input class="form-input align-right" type="number" placeholder="0.00" placeholder-class="placeholder-style" bindinput="inputDeposit" />
+        <input class="form-input align-right" type="number" placeholder="0.00" placeholder-class="placeholder-style" bindinput="inputDeposit" value="{{deposit}}" />
         <text class="unit-text">元</text>
       </view>
+    </view>
+
+    <view class="form-item textarea-item">
+      <text class="form-label">物品说明</text>
+      <textarea
+        class="form-textarea"
+        placeholder="成色、配件、借用须知等"
+        placeholder-class="placeholder-style"
+        maxlength="500"
+        bindinput="inputDescription"
+        value="{{description}}"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">微信号</text>
+      <input class="form-input" placeholder="便于借方联系（建议填写）" placeholder-class="placeholder-style" bindinput="inputWechat" value="{{contactWechat}}" />
+    </view>
+
+    <view class="form-item no-border">
+      <text class="form-label">QQ号</text>
+      <input class="form-input" type="number" placeholder="选填" placeholder-class="placeholder-style" bindinput="inputQQ" value="{{contactQQ}}" />
     </view>
 
   </view>

@@ -73,6 +73,11 @@
             <view class="action-name">我的租借</view>
             <view class="action-arrow"></view>
           </view>
+          <view class="action-item" hover-class="action-hover" bindtap="goToMyReceived">
+            <view class="action-name">收到的预约</view>
+            <view class="action-badge" wx:if="{{receivedOrdersCount > 0}}">{{receivedOrdersCount}}</view>
+            <view class="action-arrow"></view>
+          </view>
         </view>
       </view>
 

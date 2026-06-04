@@ -1,0 +1,26 @@
+<view class="container">
+  <view
+    class="order-card"
+    wx:for="{{orderList}}"
+    wx:key="_id"
+    bindtap="goToOrder"
+    data-id="{{item._id}}"
+  >
+    <view class="order-info">
+      <text class="order-title">{{item.itemTitle}}</text>
+      <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
+      <text class="order-role">他人预约 · 待你配合面交/归还</text>
+    </view>
+    <view class="order-right">
+      <view class="status-tag {{item.status}}">
+        {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束')}}
+      </view>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{isEmpty}}">
+    <text class="empty-text">还没有人预约你的物品</text>
+    <button class="empty-btn" bindtap="goToPublish">去发布</button>
+  </view>
+</view>
