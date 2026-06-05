@@ -49,6 +49,6 @@ Page({
   },
 
   goToPublish() {
-    wx.switchTab({ url: '/pages/publish/publish' });
+    wx.switchTab({ url: '/pages/my-publish/my-publish' });
   },
 });

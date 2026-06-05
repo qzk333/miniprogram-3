@@ -10,6 +10,7 @@ Page({
   onShow() {
     this.fetchItems();
     this.showPendingOrderTip();
+    getApp().refreshMineTabBadge();
   },
 
   /** 预约成功后从详情返回首页时弹出一次性引导 */
@@ -22,13 +23,15 @@ Page({
     const dateRange = `${tip.startDate} 至 ${tip.endDate}`;
     wx.showModal({
       title: '预约成功',
-      content: `「${tip.itemTitle}」\n${dateRange}\n\n面交时请打开「我的 → 我的租借」上传凭证并确认交接。`,
+      content: `「${tip.itemTitle}」\n${dateRange}\n\n面交时请打开底部「我的租借」上传凭证并确认交接。`,
       confirmText: '我的租借',
       cancelText: '继续逛逛',
       success: (res) => {
         if (res.confirm) {
-          const q = tip.orderId ? `?highlight=${tip.orderId}` : '';
-          wx.navigateTo({ url: `/pages/my-orders/my-orders${q}` });
+          if (tip.orderId) {
+            app.globalData.highlightOrderId = tip.orderId;
+          }
+          wx.switchTab({ url: '/pages/my-orders/my-orders' });
         }
       },
     });
@@ -52,7 +55,7 @@ Page({
   },
 
   goToPublish() {
-    wx.switchTab({ url: '/pages/publish/publish' });
+    wx.switchTab({ url: '/pages/my-publish/my-publish' });
   },
   switchCategory(e) {
     const category = e.currentTarget.dataset.category;

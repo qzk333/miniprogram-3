@@ -1,4 +1,5 @@
 const db = wx.cloud.database();
+const { pushCommentNotifications } = require('../../utils/notify');
 const MAX_COMMENT_LEN = 200;
 
 Page({
@@ -13,9 +14,12 @@ Page({
     selectStep: 0,
     rentDays: 0,
     rentTotal: '',
-    comments: [],
+    commentTree: [],
+    commentCount: 0,
     commentInput: '',
+    replyTarget: null,
     loadingItem: true,
+    showBookConfirm: false,
   },
 
   onLoad(options) {
@@ -56,6 +60,7 @@ Page({
       .get({
         success: (res) => {
           this.setData({ item: res.data, loadingItem: false });
+          this.fetchComments();
         },
         fail: () => {
           this.setData({ loadingItem: false });
@@ -80,15 +85,83 @@ Page({
   fetchComments() {
     db.collection('comments')
       .where({ itemId: this.itemId })
-      .orderBy('createTime', 'desc')
-      .limit(50)
+      .orderBy('createTime', 'asc')
+      .limit(100)
       .get()
       .then((res) => {
-        this.setData({ comments: res.data });
+        const publisherOpenid = this.data.item.publisherOpenid || '';
+        const tree = this.buildCommentTree(res.data, publisherOpenid);
+        this.setData({
+          commentTree: tree,
+          commentCount: res.data.length,
+        });
       })
       .catch(() => {
         wx.showToast({ title: '评论加载失败', icon: 'none' });
       });
+  },
+
+  /** 扁平评论转树：顶层按时间倒序，楼中楼按时间正序（回复均挂在顶层评论下） */
+  buildCommentTree(list, publisherOpenid) {
+    const enrich = (c) => ({
+      ...c,
+      isPublisher: !!(publisherOpenid && c.authorOpenid === publisherOpenid),
+    });
+    const map = {};
+    list.forEach((c) => {
+      map[c._id] = { ...enrich(c), replies: [] };
+    });
+    const resolveRootId = (c) => {
+      if (!c.replyToId) return null;
+      let id = c.replyToId;
+      const visited = new Set();
+      while (id && map[id] && !visited.has(id)) {
+        visited.add(id);
+        const parent = list.find((x) => x._id === id);
+        if (!parent || !parent.replyToId) return id;
+        id = parent.replyToId;
+      }
+      return c.replyToId;
+    };
+    const roots = [];
+    list.forEach((c) => {
+      const node = map[c._id];
+      if (!c.replyToId) {
+        roots.push(node);
+        return;
+      }
+      const rootId = resolveRootId(c);
+      if (rootId && map[rootId] && rootId !== c._id) {
+        map[rootId].replies.push(node);
+      } else {
+        roots.push(node);
+      }
+    });
+    roots.sort((a, b) => this.commentTime(b) - this.commentTime(a));
+    roots.forEach((r) => {
+      r.replies.sort((a, b) => this.commentTime(a) - this.commentTime(b));
+    });
+    return roots;
+  },
+
+  commentTime(c) {
+    const t = c.createTime;
+    if (!t) return 0;
+    if (t instanceof Date) return t.getTime();
+    if (typeof t === 'number') return t;
+    if (t.$date) return new Date(t.$date).getTime();
+    return new Date(t).getTime() || 0;
+  },
+
+  startReply(e) {
+    const { rootId, nickname, openid } = e.currentTarget.dataset;
+    this.setData({
+      replyTarget: { id: rootId, nickname, openid: openid || '' },
+    });
+  },
+
+  cancelReply() {
+    this.setData({ replyTarget: null });
   },
 
   generateCalendar(orders) {
@@ -236,19 +309,35 @@ Page({
     }
     const app = getApp();
     const userInfo = app.globalData.userInfo || {};
+    const replyTarget = this.data.replyTarget;
+    const payload = {
+      itemId: this.itemId,
+      content,
+      authorOpenid: app.globalData.openid,
+      authorNickname: userInfo.nickName || '微信用户',
+      createTime: db.serverDate(),
+    };
+    if (replyTarget) {
+      payload.replyToId = replyTarget.id;
+      payload.replyToNickname = replyTarget.nickname;
+      payload.replyToOpenid = replyTarget.openid || '';
+    }
+    const item = this.data.item;
     wx.showLoading({ title: '发送中' });
     db.collection('comments')
       .add({
-        data: {
-          itemId: this.itemId,
-          content,
-          authorOpenid: app.globalData.openid,
-          authorNickname: userInfo.nickName || '微信用户',
-          createTime: db.serverDate(),
-        },
-        success: () => {
+        data: payload,
+        success: (res) => {
+          pushCommentNotifications({
+            item,
+            authorOpenid: app.globalData.openid,
+            authorNickname: userInfo.nickName || '微信用户',
+            commentId: res._id,
+            content,
+            replyTarget,
+          });
           wx.hideLoading();
-          this.setData({ commentInput: '' });
+          this.setData({ commentInput: '', replyTarget: null });
           wx.showToast({ title: '已发送', icon: 'success' });
           this.fetchComments();
         },
@@ -262,14 +351,23 @@ Page({
   bookItem() {
     const app = getApp();
     app.requireLogin(() => {
-      this.doBookItem();
+      if (!this.data.startDate || !this.data.endDate) {
+        return wx.showToast({ title: '请选择借用时间段', icon: 'none' });
+      }
+      this.setData({ showBookConfirm: true });
     });
   },
 
+  closeBookConfirm() {
+    this.setData({ showBookConfirm: false });
+  },
+
+  confirmBook() {
+    this.setData({ showBookConfirm: false });
+    this.doBookItem();
+  },
+
   doBookItem() {
-    if (!this.data.startDate || !this.data.endDate) {
-      return wx.showToast({ title: '请选择借用时间段', icon: 'none' });
-    }
     const item = this.data.item;
     wx.showLoading({ title: '生成凭证中' });
     db.collection('orders')
@@ -295,6 +393,7 @@ Page({
             startDate: this.data.startDate,
             endDate: this.data.endDate,
           };
+          app.globalData.highlightOrderId = res._id;
           wx.switchTab({ url: '/pages/index/index' });
         },
         fail: () => {

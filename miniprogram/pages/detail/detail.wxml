@@ -1,6 +1,7 @@
 <view class="container">
   <image src="{{item.image}}" class="header-img" wx:if="{{item.image}}"></image>
-  <view class="info-card">
+
+  <view class="page-card info-card">
     <view class="title">{{item.title}}</view>
     <view class="price-wrap">
       <text>日租：￥{{item.rentPrice}}</text>
@@ -14,7 +15,7 @@
     </view>
   </view>
 
-  <view class="contact-card" wx:if="{{item.contactWechat || item.contactQQ}}">
+  <view class="page-card contact-card" wx:if="{{item.contactWechat || item.contactQQ}}">
     <view class="section-title">联系出借方</view>
     <view class="contact-row" wx:if="{{item.contactWechat}}">
       <text class="contact-label">微信</text>
@@ -28,30 +29,7 @@
     </view>
   </view>
 
-  <view class="comment-card">
-    <view class="section-title">物品交流区</view>
-    <view class="comment-list" wx:if="{{comments.length > 0}}">
-      <view class="comment-item" wx:for="{{comments}}" wx:key="_id">
-        <view class="comment-meta">
-          <text class="comment-author">{{item.authorNickname}}</text>
-        </view>
-        <text class="comment-content">{{item.content}}</text>
-      </view>
-    </view>
-    <view class="comment-empty" wx:else>暂无评论，可留言咨询物品情况</view>
-    <view class="comment-input-row">
-      <input
-        class="comment-input"
-        placeholder="咨询物品细节、面交地点等"
-        maxlength="200"
-        value="{{commentInput}}"
-        bindinput="onCommentInput"
-      />
-      <button class="comment-send" size="mini" bindtap="submitComment">发送</button>
-    </view>
-  </view>
-
-  <view class="calendar-card">
+  <view class="page-card calendar-card">
     <view class="cal-header">
       <view class="cal-title">{{currentMonth}}</view>
       <view class="cal-status">已选：{{startDate || '—'}} 至 {{endDate || '—'}}</view>
@@ -89,4 +67,81 @@
   </view>
 
   <button type="primary" class="book-btn" bindtap="bookItem">预约并生成交接单</button>
+
+  <!-- 预约确认弹层 -->
+  <view class="confirm-mask" wx:if="{{showBookConfirm}}" catchtap="closeBookConfirm">
+    <view class="confirm-panel" catchtap="">
+      <view class="confirm-title">确认预约</view>
+      <view class="confirm-subtitle">请核对以下信息后再提交</view>
+      <view class="confirm-row">
+        <text class="confirm-label">物品</text>
+        <text class="confirm-value">{{item.title}}</text>
+      </view>
+      <view class="confirm-row">
+        <text class="confirm-label">借用时间</text>
+        <text class="confirm-value">{{startDate}} 至 {{endDate}}</text>
+      </view>
+      <view class="confirm-row" wx:if="{{rentDays > 0}}">
+        <text class="confirm-label">约计租金</text>
+        <text class="confirm-value highlight">约 ￥{{rentTotal}}（{{rentDays}} 天，面交结算）</text>
+      </view>
+      <view class="confirm-row">
+        <text class="confirm-label">押金</text>
+        <text class="confirm-value {{isVerified ? 'highlight' : ''}}">
+          {{isVerified ? '已认证，免押金' : '￥' + item.deposit + '（线下）'}}
+        </text>
+      </view>
+      <view class="confirm-tip">提交后将占用所选日期，请按约定完成面交</view>
+      <view class="confirm-actions">
+        <button class="confirm-cancel" bindtap="closeBookConfirm">再想想</button>
+        <button class="confirm-ok" bindtap="confirmBook">确认预约</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="page-card comment-card">
+    <view class="section-title">物品交流区</view>
+    <view class="comment-count" wx:if="{{commentCount > 0}}">共 {{commentCount}} 条</view>
+
+    <view class="comment-list" wx:if="{{commentTree.length > 0}}">
+      <view class="comment-block" wx:for="{{commentTree}}" wx:key="_id" wx:for-item="root">
+        <view class="comment-item">
+          <view class="comment-meta">
+            <text class="comment-author">{{root.authorNickname}}</text>
+            <text class="publisher-badge" wx:if="{{root.isPublisher}}">发布者</text>
+            <text class="reply-btn" catchtap="startReply" data-root-id="{{root._id}}" data-nickname="{{root.authorNickname}}" data-openid="{{root.authorOpenid}}">回复</text>
+          </view>
+          <text class="comment-content">{{root.content}}</text>
+        </view>
+
+        <view class="reply-list" wx:if="{{root.replies.length > 0}}">
+          <view class="reply-item" wx:for="{{root.replies}}" wx:key="_id" wx:for-item="reply">
+            <view class="comment-meta">
+              <text class="comment-author">{{reply.authorNickname}}</text>
+              <text class="publisher-badge" wx:if="{{reply.isPublisher}}">发布者</text>
+              <text class="reply-to">回复 {{reply.replyToNickname}}</text>
+              <text class="reply-btn" catchtap="startReply" data-root-id="{{root._id}}" data-nickname="{{reply.authorNickname}}" data-openid="{{reply.authorOpenid}}">回复</text>
+            </view>
+            <text class="comment-content">{{reply.content}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="comment-empty" wx:else>暂无评论，可留言咨询物品情况</view>
+
+    <view class="reply-hint" wx:if="{{replyTarget}}">
+      <text>正在回复 @{{replyTarget.nickname}}</text>
+      <text class="cancel-reply" bindtap="cancelReply">取消</text>
+    </view>
+    <view class="comment-input-row">
+      <input
+        class="comment-input"
+        placeholder="{{replyTarget ? '回复 @' + replyTarget.nickname : '咨询物品细节、面交地点等'}}"
+        maxlength="200"
+        value="{{commentInput}}"
+        bindinput="onCommentInput"
+      />
+      <button class="comment-send" size="mini" bindtap="submitComment">发送</button>
+    </view>
+  </view>
 </view>

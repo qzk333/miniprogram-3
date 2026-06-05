@@ -1,16 +1,47 @@
-<view class="container">
-  <view class="item-card" wx:for="{{itemList}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
-    <image src="{{item.image}}" mode="aspectFill" class="item-img"></image>
-    <view class="item-info">
-      <text class="title">{{item.title}}</text>
-      <text class="price">{{item.category || '未分类'}}</text>
-      <text class="price">日租: ¥{{item.rentPrice}} | 押金: ¥{{item.deposit}}</text>
-    </view>
-    <view class="arrow">›</view>
+<view class="page-wrapper">
+  <image class="bg-image" src="/images/sysu1.jpg" mode="aspectFill"></image>
+  <view class="bg-overlay"></view>
+
+  <view class="container">
+  <view class="login-tip-card" wx:if="{{!isLoggedIn}}">
+    <text class="login-tip-text">登录后管理你发布的物品</text>
+    <button class="login-tip-btn" bindtap="goLogin">去登录</button>
   </view>
 
-  <view class="empty" wx:if="{{isEmpty}}">
-    <text class="empty-text">还没有发布任何物品</text>
-    <button class="empty-btn" bindtap="goToPublish">去发布</button>
+  <block wx:else>
+    <view class="page-header">
+      <text class="page-header-title">已发布 {{itemList.length}} 件</text>
+    </view>
+
+    <view class="item-card" wx:for="{{itemList}}" wx:key="_id">
+      <view class="item-main" bindtap="goToDetail" data-id="{{item._id}}">
+        <image src="{{item.image}}" mode="aspectFill" class="item-img"></image>
+        <view class="item-info">
+          <text class="title">{{item.title}}</text>
+          <text class="meta">{{item.category || '未分类'}}</text>
+          <text class="meta">日租 ¥{{item.rentPrice}} · 押金 ¥{{item.deposit}}</text>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+      <view class="item-actions">
+        <button
+          class="delete-btn"
+          catchtap="deleteItem"
+          data-id="{{item._id}}"
+          data-title="{{item.title}}"
+        >删除</button>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{isEmpty}}">
+      <text class="empty-text">还没有发布任何物品</text>
+      <button class="empty-btn" bindtap="goToPublishForm">发布第一件</button>
+    </view>
+  </block>
+
+  <view class="fab-publish" wx:if="{{isLoggedIn}}" bindtap="goToPublishForm">
+    <text class="fab-icon">+</text>
+    <text class="fab-text">发布物品</text>
+  </view>
   </view>
 </view>

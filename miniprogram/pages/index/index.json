@@ -1,4 +1,5 @@
 {
+  "navigationBarTitleText": "校园借借",
   "usingComponents": {
     "cloud-tip-modal": "/components/cloudTipModal/index"
   }

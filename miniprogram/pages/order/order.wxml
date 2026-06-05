@@ -1,50 +1,100 @@
 <view class="container">
-  <view class="order-info">
-    <view class="title">物品：{{order.itemTitle}}</view>
-    <view>借用期限：{{order.startDate}} 至 {{order.endDate}}</view>
-    <view>当前状态：{{statusText}}</view>
+  <block wx:if="{{!showHandoverSuccess && !showReturnSuccess}}">
+    <view class="order-info">
+      <view class="title">物品：{{order.itemTitle}}</view>
+      <view>借用期限：{{order.startDate}} 至 {{order.endDate}}</view>
+      <view>当前状态：{{statusText}}</view>
+    </view>
+
+    <!-- 步骤条 -->
+    <view class="stepper" wx:if="{{order.status}}">
+      <view class="stepper-row">
+        <view class="stepper-item {{stepStates[0]}}">
+          <view class="stepper-node">1</view>
+          <text class="stepper-label">预约</text>
+        </view>
+        <view class="stepper-line {{stepStates[1] ? 'done' : ''}}"></view>
+        <view class="stepper-item {{stepStates[1]}}">
+          <view class="stepper-node">2</view>
+          <text class="stepper-label">面交</text>
+        </view>
+        <view class="stepper-line {{stepStates[2] ? 'done' : ''}}"></view>
+        <view class="stepper-item {{stepStates[2]}}">
+          <view class="stepper-node">3</view>
+          <text class="stepper-label">归还</text>
+        </view>
+        <view class="stepper-line {{stepStates[3] ? 'done' : ''}}"></view>
+        <view class="stepper-item {{stepStates[3]}}">
+          <view class="stepper-node">4</view>
+          <text class="stepper-label">完成</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 面交环节 -->
+    <view class="action-card" wx:if="{{order.status == 'pending'}}">
+      <view class="step-title">面交验机拍照</view>
+      <view class="desc">请双方当面确认物品完好，并拍下细节图存证。</view>
+      <button class="card-btn" bindtap="uploadHandoverPhotos">上传面交照片</button>
+      <image wx:if="{{order.handoverImage}}" src="{{order.handoverImage}}" class="proof-img" mode="aspectFill"></image>
+      <button type="primary" class="card-btn primary" wx:if="{{order.handoverImage}}" bindtap="confirmHandover">确认交接完毕</button>
+    </view>
+
+    <!-- 归还环节 -->
+    <view class="action-card" wx:if="{{order.status == 'active'}}">
+      <view class="step-title">归还验机拍照</view>
+      <view class="desc">归还时拍照确认物品无损，线下退还押金。</view>
+      <button class="card-btn" bindtap="uploadReturnPhotos">上传归还照片</button>
+      <image wx:if="{{order.returnImage}}" src="{{order.returnImage}}" class="proof-img" mode="aspectFill"></image>
+      <button type="primary" class="card-btn primary" wx:if="{{order.returnImage}}" bindtap="confirmReturn">确认归还，结束订单</button>
+    </view>
+
+    <!-- 已完成（从历史记录进入） -->
+    <view class="action-card done-card" wx:if="{{order.status == 'done'}}">
+      <view class="done-icon">✓</view>
+      <view class="step-title">订单已结束</view>
+      <view class="desc">感谢使用校园借借，欢迎继续租借其他物品。</view>
+      <button type="primary" class="footer-btn" bindtap="goToMyOrders">返回我的租借</button>
+      <button class="footer-btn secondary" bindtap="goToIndex">回首页逛逛</button>
+    </view>
+
+    <!-- 进行中：底部返回入口 -->
+    <view class="footer-nav" wx:if="{{order.status == 'pending' || order.status == 'active'}}">
+      <button class="footer-btn secondary" bindtap="goToMyOrders">返回我的租借</button>
+    </view>
+  </block>
+
+  <!-- 面交成功 -->
+  <view class="success-page" wx:if="{{showHandoverSuccess}}">
+    <view class="success-card">
+      <view class="success-icon-wrap">
+        <view class="success-icon">✓</view>
+      </view>
+      <view class="success-title">面交成功</view>
+      <view class="success-desc">物品已顺利交接，当前为借用中。</view>
+      <view class="success-hint">请在借用期满后，从「我的租借」点击「去归还」完成归还流程。</view>
+      <view class="success-info">
+        <text>{{order.itemTitle}}</text>
+        <text>{{order.startDate}} 至 {{order.endDate}}</text>
+      </view>
+      <button type="primary" class="footer-btn" bindtap="goToMyOrders">返回我的租借</button>
+    </view>
   </view>
 
-  <!-- 步骤条 -->
-  <view class="steps-bar" wx:if="{{order.status}}">
-    <view class="step done"><text class="step-dot">1</text><text>预约</text></view>
-    <view class="step-line {{order.status !== 'pending' ? 'done' : ''}}"></view>
-    <view class="step {{order.status !== 'pending' ? 'done' : 'current'}}"><text class="step-dot">2</text><text>面交</text></view>
-    <view class="step-line {{order.status === 'active' || order.status === 'done' ? 'done' : ''}}"></view>
-    <view class="step {{order.status === 'active' ? 'current' : (order.status === 'done' ? 'done' : '')}}"><text class="step-dot">3</text><text>归还</text></view>
-    <view class="step-line {{order.status === 'done' ? 'done' : ''}}"></view>
-    <view class="step {{order.status === 'done' ? 'done' : ''}}"><text class="step-dot">4</text><text>完成</text></view>
-  </view>
-
-  <!-- 面交环节 -->
-  <view class="action-card" wx:if="{{order.status == 'pending'}}">
-    <view class="step-title">面交验机拍照</view>
-    <view class="desc">请双方当面确认物品完好，并拍下细节图存证。</view>
-    <button bindtap="uploadHandoverPhotos">上传面交照片</button>
-    <image wx:if="{{order.handoverImage}}" src="{{order.handoverImage}}" class="proof-img" mode="aspectFill"></image>
-    <button type="primary" wx:if="{{order.handoverImage}}" bindtap="confirmHandover">确认交接完毕</button>
-  </view>
-
-  <!-- 归还环节 -->
-  <view class="action-card" wx:if="{{order.status == 'active'}}">
-    <view class="step-title">归还验机拍照</view>
-    <view class="desc">归还时拍照确认物品无损，线下退还押金。</view>
-    <button bindtap="uploadReturnPhotos">上传归还照片</button>
-    <image wx:if="{{order.returnImage}}" src="{{order.returnImage}}" class="proof-img" mode="aspectFill"></image>
-    <button type="primary" wx:if="{{order.returnImage}}" bindtap="confirmReturn">确认归还，结束订单</button>
-  </view>
-
-  <!-- 已完成 -->
-  <view class="action-card done-card" wx:if="{{order.status == 'done'}}">
-    <view class="done-icon">✓</view>
-    <view class="step-title">订单已结束</view>
-    <view class="desc">感谢使用校园借借，欢迎继续租借其他物品。</view>
-    <button type="primary" class="footer-btn" bindtap="goToMyOrders">返回我的租借</button>
-    <button class="footer-btn secondary" bindtap="goToIndex">回首页逛逛</button>
-  </view>
-
-  <!-- 进行中：底部返回入口 -->
-  <view class="footer-nav" wx:if="{{order.status == 'pending' || order.status == 'active'}}">
-    <button class="footer-btn secondary" bindtap="goToMyOrders">返回我的租借</button>
+  <!-- 归还成功 -->
+  <view class="success-page" wx:if="{{showReturnSuccess}}">
+    <view class="success-card">
+      <view class="success-icon-wrap">
+        <view class="success-icon">✓</view>
+      </view>
+      <view class="success-title">归还成功</view>
+      <view class="success-desc">订单已结束，感谢使用校园借借。</view>
+      <view class="success-info">
+        <text>{{order.itemTitle}}</text>
+        <text>{{order.startDate}} 至 {{order.endDate}}</text>
+      </view>
+      <button type="primary" class="footer-btn" bindtap="goToMyOrders">返回我的租借</button>
+      <button class="footer-btn secondary" bindtap="goToIndex">回首页逛逛</button>
+    </view>
   </view>
 </view>

@@ -17,6 +17,9 @@ Page({
     orderId: '',
     order: {},
     statusText: '',
+    showHandoverSuccess: false,
+    showReturnSuccess: false,
+    stepStates: ['done', 'current', '', ''],
   },
 
   onLoad(options) {
@@ -37,10 +40,13 @@ Page({
         success: (res) => {
           const order = res.data;
           const status = order.status || 'pending';
-          wx.setNavigationBarTitle({ title: STATUS_TITLE[status] || '订单详情' });
+          if (!this.data.showHandoverSuccess && !this.data.showReturnSuccess) {
+            wx.setNavigationBarTitle({ title: STATUS_TITLE[status] || '订单详情' });
+          }
           this.setData({
             order,
             statusText: STATUS_TEXT[status] || status,
+            stepStates: this.computeStepStates(status),
           });
         },
       });
@@ -94,17 +100,37 @@ Page({
     this.uploadPhoto('returnImage');
   },
 
+  computeStepStates(status) {
+    const map = {
+      pending: ['done', 'current', '', ''],
+      active: ['done', 'done', 'current', ''],
+      done: ['done', 'done', 'done', 'done'],
+    };
+    return map[status] || ['done', '', '', ''];
+  },
+
   confirmHandover() {
     getApp().requireLogin(() => {
+      if (!this.data.order.handoverImage) {
+        return wx.showToast({ title: '请先上传面交照片', icon: 'none' });
+      }
+      wx.showLoading({ title: '提交中' });
       db.collection('orders')
         .doc(this.data.orderId)
         .update({
           data: { status: 'active' },
           success: () => {
-            wx.showToast({ title: '交接成功', icon: 'success' });
-            this.fetchOrder();
+            wx.hideLoading();
+            wx.setNavigationBarTitle({ title: '面交成功' });
+            this.setData({
+              showHandoverSuccess: true,
+              'order.status': 'active',
+              statusText: STATUS_TEXT.active,
+              stepStates: this.computeStepStates('active'),
+            });
           },
           fail: () => {
+            wx.hideLoading();
             wx.showToast({ title: '操作失败', icon: 'none' });
           },
         });
@@ -113,15 +139,26 @@ Page({
 
   confirmReturn() {
     getApp().requireLogin(() => {
+      if (!this.data.order.returnImage) {
+        return wx.showToast({ title: '请先上传归还照片', icon: 'none' });
+      }
+      wx.showLoading({ title: '提交中' });
       db.collection('orders')
         .doc(this.data.orderId)
         .update({
           data: { status: 'done' },
           success: () => {
-            wx.showToast({ title: '订单已完成', icon: 'success' });
-            this.fetchOrder();
+            wx.hideLoading();
+            wx.setNavigationBarTitle({ title: '归还成功' });
+            this.setData({
+              showReturnSuccess: true,
+              'order.status': 'done',
+              statusText: STATUS_TEXT.done,
+              stepStates: this.computeStepStates('done'),
+            });
           },
           fail: () => {
+            wx.hideLoading();
             wx.showToast({ title: '操作失败', icon: 'none' });
           },
         });
@@ -129,11 +166,8 @@ Page({
   },
 
   goToMyOrders() {
-    wx.navigateBack({
-      fail: () => {
-        wx.navigateTo({ url: '/pages/my-orders/my-orders' });
-      },
-    });
+    this.setData({ showHandoverSuccess: false, showReturnSuccess: false });
+    wx.switchTab({ url: '/pages/my-orders/my-orders' });
   },
 
   goToIndex() {

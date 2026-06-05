@@ -11,14 +11,16 @@ Page({
     publishedCount: 0,
     activeOrdersCount: 0,
     receivedOrdersCount: 0,
+    unreadMessagesCount: 0,
   },
 
   onShow() {
     const app = getApp();
     const isLoggedIn = app.globalData.isLoggedIn;
     this.setData({ isLoggedIn });
+    // 进入「我的」后立即隐藏 Tab 红点（「收到的预约」数字角标仍保留）
+    app.hideMineTabRedDot();
     if (isLoggedIn) {
-      // 从数据库同步最新用户状态（头像、昵称、认证信息）
       this.syncUserFromCloud(app.globalData.openid);
     }
   },
@@ -47,8 +49,8 @@ Page({
     wx.setStorageSync('openid', openid);
     this.setData({ isLoggedIn: true });
 
-    // 从云端同步用户资料（新用户自动创建记录，老用户恢复头像昵称）
     this.syncUserFromCloud(openid);
+    getApp().refreshMineTabBadge();
   },
 
   /**
@@ -142,25 +144,31 @@ Page({
           .count();
       })
       .then((res) => {
-        this.setData({ receivedOrdersCount: res.total });
+        const count = res.total;
+        this.setData({ receivedOrdersCount: count });
+        getApp().markReceivedBadgeSeen(count);
       })
       .catch(() => {});
-  },
-
-  // 导航到我的发布
-  goToMyPublish() {
-    wx.navigateTo({ url: '/pages/my-publish/my-publish' });
-  },
-
-  // 导航到我的租借
-  goToMyOrders() {
-    wx.navigateTo({ url: '/pages/my-orders/my-orders' });
+    getApp()
+      .fetchUnreadMessagesCount(openid)
+      .then((count) => {
+        this.setData({ unreadMessagesCount: count });
+        getApp().markMessagesBadgeSeen(count);
+      })
+      .catch(() => {});
   },
 
   goToMyReceived() {
     const app = getApp();
     app.requireLogin(() => {
       wx.navigateTo({ url: '/pages/my-received/my-received' });
+    });
+  },
+
+  goToMyMessages() {
+    const app = getApp();
+    app.requireLogin(() => {
+      wx.navigateTo({ url: '/pages/my-messages/my-messages' });
     });
   },
 

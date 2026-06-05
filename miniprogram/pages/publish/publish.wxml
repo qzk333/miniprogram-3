@@ -27,7 +27,7 @@
     <view class="form-item">
       <text class="form-label">日租金</text>
       <view class="input-wrapper">
-        <input class="form-input align-right" type="number" placeholder="0.00" placeholder-class="placeholder-style" bindinput="inputRent" />
+        <input class="form-input align-right" type="digit" placeholder="0.00" placeholder-class="placeholder-style" bindinput="inputRent" value="{{rentPrice}}" />
         <text class="unit-text">元/天</text>
       </view>
     </view>

@@ -65,17 +65,14 @@
           <text>快捷入口</text>
         </view>
         <view class="action-list">
-          <view class="action-item" hover-class="action-hover" bindtap="goToMyPublish">
-            <view class="action-name">我的发布</view>
-            <view class="action-arrow"></view>
-          </view>
-          <view class="action-item" hover-class="action-hover" bindtap="goToMyOrders">
-            <view class="action-name">我的租借</view>
-            <view class="action-arrow"></view>
-          </view>
           <view class="action-item" hover-class="action-hover" bindtap="goToMyReceived">
             <view class="action-name">收到的预约</view>
             <view class="action-badge" wx:if="{{receivedOrdersCount > 0}}">{{receivedOrdersCount}}</view>
+            <view class="action-arrow"></view>
+          </view>
+          <view class="action-item" hover-class="action-hover" bindtap="goToMyMessages">
+            <view class="action-name">收到的私信</view>
+            <view class="action-badge" wx:if="{{unreadMessagesCount > 0}}">{{unreadMessagesCount}}</view>
             <view class="action-arrow"></view>
           </view>
         </view>
