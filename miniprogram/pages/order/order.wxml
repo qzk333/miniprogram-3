@@ -37,10 +37,27 @@
       </view>
     </view>
 
+    <!-- 租金托管 -->
+    <view class="action-card pay-card" wx:if="{{order.status == 'pending' && isBorrower}}">
+      <view class="step-title">租金托管</view>
+      <view class="desc">面交前一次性付清租金，平台代为保管，归还后结算给出借方。</view>
+      <view class="pay-amount">{{rentDisplay}}</view>
+      <view class="pay-status-tag {{order.payStatus}}" wx:if="{{order.payStatus !== 'unpaid'}}">
+        {{order.payStatus === 'paid' ? '✓ 租金已托管至平台' : '租金已结算'}}
+      </view>
+      <button
+        type="primary"
+        class="card-btn primary"
+        wx:if="{{order.payStatus === 'unpaid'}}"
+        bindtap="payRent"
+      >支付租金{{mockPay ? '（演示）' : ''}}</button>
+    </view>
+
     <!-- 面交环节 -->
     <view class="action-card" wx:if="{{order.status == 'pending' && canOperate}}">
       <view class="step-title">面交验机拍照</view>
-      <view class="desc">请双方当面确认物品完好。借方上传照片，双方分别确认交接。</view>
+      <view class="desc">请双方当面确认物品完好。借方须先完成租金托管，再上传照片并由双方确认交接。</view>
+      <view class="wait-tip" wx:if="{{isBorrower && order.payStatus === 'unpaid'}}">请先完成上方租金托管</view>
 
       <block wx:if="{{isBorrower}}">
         <button class="card-btn" bindtap="uploadHandoverPhotos">上传面交照片</button>

@@ -14,6 +14,8 @@ App({
     lastReceivedBadgeSeenCount: 0,
     unreadMessagesCount: 0,
     lastMessagesBadgeSeenCount: 0,
+    /** 演示模式：模拟支付租金，无需商户号 */
+    MOCK_PAY: true,
   },
 
   onLaunch: function () {

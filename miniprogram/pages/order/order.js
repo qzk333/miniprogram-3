@@ -47,13 +47,18 @@ Page({
     isBorrower: false,
     isPublisher: false,
     canOperate: false,
+    mockPay: true,
     showHandoverSuccess: false,
     showReturnSuccess: false,
     stepStates: ['done', 'current', '', ''],
   },
 
   onLoad(options) {
-    this.setData({ orderId: options.id });
+    const app = getApp();
+    this.setData({
+      orderId: options.id,
+      mockPay: !!(app.globalData && app.globalData.MOCK_PAY),
+    });
     this.fetchOrder();
   },
 
@@ -139,6 +144,52 @@ Page({
     });
   },
 
+  payRent() {
+    if (!this.data.isBorrower) return;
+    const { order, rentDisplay, mockPay } = this.data;
+    if (order.payStatus === 'paid' || order.payStatus === 'settled') {
+      return wx.showToast({ title: '租金已支付', icon: 'none' });
+    }
+    getApp().requireLogin(() => {
+      const tip = mockPay
+        ? `演示模式：确认将租金 ${rentDisplay} 托管至平台？`
+        : `确认支付租金 ${rentDisplay}？`;
+      wx.showModal({
+        title: '支付租金',
+        content: tip,
+        confirmText: '确认支付',
+        success: (res) => {
+          if (res.confirm) this.doConfirmPay();
+        },
+      });
+    });
+  },
+
+  doConfirmPay() {
+    wx.showLoading({ title: '支付中' });
+    wx.cloud.callFunction({
+      name: 'confirmPay',
+      data: {
+        orderId: this.data.orderId,
+        payMode: this.data.mockPay ? 'mock' : 'offline',
+      },
+      success: (res) => {
+        wx.hideLoading();
+        const result = res.result || {};
+        if (result.success) {
+          wx.showToast({ title: '租金已托管', icon: 'success' });
+          this.fetchOrder();
+        } else {
+          wx.showToast({ title: result.errMsg || '支付失败', icon: 'none' });
+        }
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({ title: '支付服务不可用', icon: 'none' });
+      },
+    });
+  },
+
   uploadHandoverPhotos() {
     this.uploadPhoto('handoverImage');
   },
@@ -194,6 +245,9 @@ Page({
   tryActivateOrder() {
     const { order } = this.data;
     if (order.status !== 'pending') return;
+    if (order.payStatus !== 'paid' && order.payStatus !== 'settled') {
+      return;
+    }
     if (
       !order.handoverImage ||
       !order.borrowerHandoverOk ||
@@ -274,13 +328,17 @@ Page({
       .update({
         data: { status: 'done' },
         success: () => {
-          wx.hideLoading();
-          wx.setNavigationBarTitle({ title: '归还成功' });
-          this.setData({
-            showReturnSuccess: true,
-            'order.status': 'done',
-            statusText: STATUS_TEXT.done,
-            stepStates: this.computeStepStates('done'),
+          this.invokeSettleRent(() => {
+            wx.hideLoading();
+            wx.setNavigationBarTitle({ title: '归还成功' });
+            this.setData({
+              showReturnSuccess: true,
+              'order.status': 'done',
+              'order.payStatus': 'settled',
+              statusText: STATUS_TEXT.done,
+              payStatusText: PAY_STATUS_TEXT.settled,
+              stepStates: this.computeStepStates('done'),
+            });
           });
         },
         fail: () => {
@@ -288,6 +346,21 @@ Page({
           wx.showToast({ title: '操作失败', icon: 'none' });
         },
       });
+  },
+
+  invokeSettleRent(done) {
+    const { order } = this.data;
+    if (order.payStatus !== 'paid') {
+      if (typeof done === 'function') done();
+      return;
+    }
+    wx.cloud.callFunction({
+      name: 'settleRent',
+      data: { orderId: this.data.orderId },
+      complete: () => {
+        if (typeof done === 'function') done();
+      },
+    });
   },
 
   goToMyOrders() {
