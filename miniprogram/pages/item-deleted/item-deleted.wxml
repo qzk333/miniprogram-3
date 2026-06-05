@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="card">
+    <view class="icon-wrap">
+      <text class="icon">!</text>
+    </view>
+    <view class="title">物品已被删除</view>
+    <view class="desc">该物品可能已被发布者下架或删除，无法继续查看详情。</view>
+    <view class="hint">私信中的记录仅作通知留存，关联物品可能已不存在。</view>
+    <button class="btn primary" bindtap="goBack">返回上一页</button>
+    <button class="btn secondary" bindtap="goHome">回首页逛逛</button>
+  </view>
+</view>

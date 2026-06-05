@@ -78,7 +78,8 @@ page {
   letter-spacing: 1rpx;
 }
 
-.item-card {
+.item-card,
+.list-card {
   background: rgba(255, 255, 255, 0.98);
   border-radius: 20rpx;
   margin-bottom: 28rpx;

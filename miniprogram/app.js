@@ -100,6 +100,22 @@ App({
       const hasNewMessages = msgCount > msgSeen && msgCount > 0;
       if (hasNewOrders || hasNewMessages) {
         wx.showTabBarRedDot({ index: MINE_TAB_INDEX });
+      } else {
+        wx.hideTabBarRedDot({ index: MINE_TAB_INDEX });
+      }
+    });
+  },
+
+  /** 同步私信未读数到全局、本地存储及「我的」页角标 */
+  syncMessagesBadge(unreadCount) {
+    this.globalData.unreadMessagesCount = unreadCount;
+    this.globalData.lastMessagesBadgeSeenCount = unreadCount;
+    wx.setStorageSync('lastMessagesBadgeSeenCount', unreadCount);
+    wx.hideTabBarRedDot({ index: MINE_TAB_INDEX });
+    const pages = getCurrentPages();
+    pages.forEach((page) => {
+      if (page.route === 'pages/mine/mine') {
+        page.setData({ unreadMessagesCount: unreadCount });
       }
     });
   },

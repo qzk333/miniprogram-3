@@ -93,7 +93,8 @@
         <view class="confirm-done" wx:if="{{order.publisherHandoverOk}}">✓ 你已确认交出物品</view>
       </block>
 
-      <view class="pending-hint" wx:if="{{order.borrowerHandoverOk && order.publisherHandoverOk}}">双方已确认，订单即将进入借用中…</view>
+      <view class="pending-hint" wx:if="{{order.borrowerHandoverOk && order.publisherHandoverOk && order.payStatus !== 'unpaid'}}">双方已确认，正在进入借用中…</view>
+      <view class="wait-tip" wx:if="{{order.borrowerHandoverOk && order.publisherHandoverOk && order.payStatus === 'unpaid'}}">双方已确认面交，请借方先完成租金托管</view>
     </view>
 
     <!-- 归还环节 -->

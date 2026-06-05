@@ -153,7 +153,6 @@ Page({
       .fetchUnreadMessagesCount(openid)
       .then((count) => {
         this.setData({ unreadMessagesCount: count });
-        getApp().markMessagesBadgeSeen(count);
       })
       .catch(() => {});
   },

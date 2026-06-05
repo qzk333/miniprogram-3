@@ -32,7 +32,7 @@ Page({
           list,
           isEmpty: list.length === 0,
         });
-        this.markAllRead(res.data);
+        this.markAllRead(list);
       })
       .catch(() => {
         wx.hideLoading();
@@ -51,23 +51,40 @@ Page({
 
   markAllRead(notifications) {
     const unread = notifications.filter((n) => !n.isRead);
-    if (unread.length === 0) return;
-    const app = getApp();
-    Promise.all(
-      unread.map((n) =>
-        db.collection('notifications').doc(n._id).update({
-          data: { isRead: true },
-        })
-      )
-    ).then(() => {
-      app.globalData.unreadMessagesCount = 0;
-      app.markMessagesBadgeSeen(0);
-    });
+    if (unread.length === 0) {
+      getApp().syncMessagesBadge(0);
+      return;
+    }
+
+    const readList = notifications.map((n) => ({ ...n, isRead: true }));
+    this.setData({ list: readList });
+    getApp().syncMessagesBadge(0);
+
+    wx.cloud
+      .callFunction({ name: 'markNotificationsRead' })
+      .then((res) => {
+        if (!res.result || !res.result.success) {
+          wx.showToast({ title: '部分已读状态同步失败', icon: 'none' });
+        }
+      })
+      .catch(() => {
+        wx.showToast({ title: '部分已读状态同步失败', icon: 'none' });
+      });
   },
 
-  goToDetail(e) {
-    const itemId = e.currentTarget.dataset.itemId;
+  goToItemPreview(e) {
+    const { itemId, orderId, notifyType, fromNickname, content } =
+      e.currentTarget.dataset;
     if (!itemId) return;
-    wx.navigateTo({ url: `/pages/detail/detail?id=${itemId}` });
+    const params = [`id=${itemId}`];
+    if (orderId) params.push(`orderId=${orderId}`);
+    if (notifyType) params.push(`notifyType=${notifyType}`);
+    if (fromNickname) {
+      params.push(`fromNickname=${encodeURIComponent(fromNickname)}`);
+    }
+    if (content) {
+      params.push(`content=${encodeURIComponent(content)}`);
+    }
+    wx.navigateTo({ url: `/pages/item-preview/item-preview?${params.join('&')}` });
   },
 });

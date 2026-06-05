@@ -29,7 +29,12 @@
     </view>
   </view>
 
-  <view class="page-card calendar-card">
+  <view class="page-card owner-tip-card" wx:if="{{isOwner}}">
+    <text class="owner-tip-title">这是你发布的物品</text>
+    <text class="owner-tip-desc">此处仅供查看评论与联系信息，如需管理请前往「我的发布」。</text>
+  </view>
+
+  <view class="page-card calendar-card" wx:if="{{!isOwner}}">
     <view class="cal-header">
       <view class="cal-title">{{currentMonth}}</view>
       <view class="cal-status">已选：{{startDate || '—'}} 至 {{endDate || '—'}}</view>
@@ -66,7 +71,7 @@
     <button class="reset-btn" bindtap="resetDates">重新选择</button>
   </view>
 
-  <button type="primary" class="book-btn" bindtap="bookItem">预约并生成交接单</button>
+  <button type="primary" class="book-btn" wx:if="{{!isOwner}}" bindtap="bookItem">预约并生成交接单</button>
 
   <!-- 预约确认弹层 -->
   <view class="confirm-mask" wx:if="{{showBookConfirm}}" catchtap="closeBookConfirm">

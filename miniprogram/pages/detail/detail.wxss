@@ -55,6 +55,26 @@
   line-height: 1.6;
 }
 
+.owner-tip-card {
+  background: #f0faf4;
+  border-left: 6rpx solid #00561f;
+}
+
+.owner-tip-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #00561f;
+  margin-bottom: 8rpx;
+}
+
+.owner-tip-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
 .section-title {
   font-size: 30rpx;
   font-weight: bold;

@@ -20,6 +20,7 @@ Page({
     replyTarget: null,
     loadingItem: true,
     showBookConfirm: false,
+    isOwner: false,
   },
 
   onLoad(options) {
@@ -59,12 +60,20 @@ Page({
       .doc(this.itemId)
       .get({
         success: (res) => {
-          this.setData({ item: res.data, loadingItem: false });
+          const item = res.data;
+          if (!item || !item.title) {
+            this.setData({ loadingItem: false });
+            wx.redirectTo({ url: '/pages/item-deleted/item-deleted' });
+            return;
+          }
+          const openid = getApp().globalData.openid || '';
+          const isOwner = !!(openid && item.publisherOpenid === openid);
+          this.setData({ item, loadingItem: false, isOwner });
           this.fetchComments();
         },
         fail: () => {
           this.setData({ loadingItem: false });
-          wx.showToast({ title: '物品加载失败', icon: 'none' });
+          wx.redirectTo({ url: '/pages/item-deleted/item-deleted' });
         },
       });
     db.collection('orders')
@@ -349,6 +358,9 @@ Page({
   },
 
   bookItem() {
+    if (this.data.isOwner) {
+      return wx.showToast({ title: '无法预约自己发布的物品', icon: 'none' });
+    }
     const app = getApp();
     app.requireLogin(() => {
       if (!this.data.startDate || !this.data.endDate) {

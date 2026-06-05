@@ -6,6 +6,8 @@
     "pages/mine/mine",
     "pages/publish/publish",
     "pages/detail/detail",
+    "pages/item-preview/item-preview",
+    "pages/item-deleted/item-deleted",
     "pages/order/order",
     "pages/my-received/my-received",
     "pages/my-messages/my-messages"

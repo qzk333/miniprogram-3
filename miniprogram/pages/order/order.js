@@ -70,37 +70,75 @@ Page({
     }
   },
 
-  fetchOrder() {
+  fetchOrder(onReady) {
     const openid = getApp().globalData.openid || '';
     db.collection('orders')
       .doc(this.data.orderId)
       .get({
         success: (res) => {
           const order = normalizeOrder(res.data);
-          const status = order.status || 'pending';
-          const isBorrower = !!(openid && order.borrowerOpenid === openid);
-          const isPublisher = !!(openid && order.publisherOpenid === openid);
-          let roleLabel = '访客';
-          if (isBorrower && isPublisher) roleLabel = '借方/出借方';
-          else if (isBorrower) roleLabel = '借方';
-          else if (isPublisher) roleLabel = '出借方';
-
-          if (!this.data.showHandoverSuccess && !this.data.showReturnSuccess) {
-            wx.setNavigationBarTitle({ title: STATUS_TITLE[status] || '订单详情' });
+          this.renderOrder(order, openid);
+          if (typeof onReady === 'function') {
+            onReady(order);
+          } else {
+            this.maybeAdvanceOrder(order);
           }
-          this.setData({
-            order,
-            statusText: STATUS_TEXT[status] || status,
-            payStatusText: PAY_STATUS_TEXT[order.payStatus] || order.payStatus,
-            rentDisplay: formatRentDisplay(order.rentTotal),
-            roleLabel,
-            isBorrower,
-            isPublisher,
-            canOperate: isBorrower || isPublisher,
-            stepStates: this.computeStepStates(status),
-          });
         },
       });
+  },
+
+  renderOrder(order, openid) {
+    const oid = openid || getApp().globalData.openid || '';
+    const status = order.status || 'pending';
+    const isBorrower = !!(oid && order.borrowerOpenid === oid);
+    const isPublisher = !!(oid && order.publisherOpenid === oid);
+    let roleLabel = '访客';
+    if (isBorrower && isPublisher) roleLabel = '借方/出借方';
+    else if (isBorrower) roleLabel = '借方';
+    else if (isPublisher) roleLabel = '出借方';
+
+    if (!this.data.showHandoverSuccess && !this.data.showReturnSuccess) {
+      wx.setNavigationBarTitle({ title: STATUS_TITLE[status] || '订单详情' });
+    }
+    this.setData({
+      order,
+      statusText: STATUS_TEXT[status] || status,
+      payStatusText: PAY_STATUS_TEXT[order.payStatus] || order.payStatus,
+      rentDisplay: formatRentDisplay(order.rentTotal),
+      roleLabel,
+      isBorrower,
+      isPublisher,
+      canOperate: isBorrower || isPublisher,
+      stepStates: this.computeStepStates(status),
+    });
+  },
+
+  /** 进入页面或刷新后，若条件已满足则补推进状态（避免双方确认后卡住） */
+  maybeAdvanceOrder(order) {
+    if (!order || this._advancing) return;
+    if (order.status === 'pending' && this.canActivate(order)) {
+      this.tryActivateOrder(order);
+    } else if (order.status === 'active' && this.canComplete(order)) {
+      this.tryCompleteOrder(order);
+    }
+  },
+
+  canActivate(order) {
+    return (
+      order.payStatus === 'paid' || order.payStatus === 'settled'
+    ) && !!(
+      order.handoverImage &&
+      order.borrowerHandoverOk &&
+      order.publisherHandoverOk
+    );
+  },
+
+  canComplete(order) {
+    return !!(
+      order.returnImage &&
+      order.borrowerReturnOk &&
+      order.publisherReturnOk
+    );
   },
 
   uploadPhoto(field) {
@@ -234,9 +272,10 @@ Page({
       .update({
         data: { [field]: value },
         success: () => {
-          wx.hideLoading();
-          this.fetchOrder();
-          this.tryActivateOrder();
+          this.fetchOrder((order) => {
+            wx.hideLoading();
+            this.tryActivateOrder(order);
+          });
         },
         fail: () => {
           wx.hideLoading();
@@ -245,25 +284,19 @@ Page({
       });
   },
 
-  tryActivateOrder() {
-    const { order } = this.data;
-    if (order.status !== 'pending') return;
-    if (order.payStatus !== 'paid' && order.payStatus !== 'settled') {
-      return;
-    }
-    if (
-      !order.handoverImage ||
-      !order.borrowerHandoverOk ||
-      !order.publisherHandoverOk
-    ) {
-      return;
-    }
+  tryActivateOrder(order) {
+    const o = order || this.data.order;
+    if (!o || o.status !== 'pending' || !this.canActivate(o)) return;
+    if (this._advancing) return;
+    this._advancing = true;
+
     wx.showLoading({ title: '确认交接' });
     db.collection('orders')
       .doc(this.data.orderId)
       .update({
         data: { status: 'active' },
         success: () => {
+          this._advancing = false;
           wx.hideLoading();
           wx.setNavigationBarTitle({ title: '面交成功' });
           this.setData({
@@ -274,6 +307,7 @@ Page({
           });
         },
         fail: () => {
+          this._advancing = false;
           wx.hideLoading();
           wx.showToast({ title: '操作失败', icon: 'none' });
         },
@@ -304,44 +338,9 @@ Page({
       .update({
         data: { [field]: value },
         success: () => {
-          wx.hideLoading();
-          this.fetchOrder();
-          this.tryCompleteOrder();
-        },
-        fail: () => {
-          wx.hideLoading();
-          wx.showToast({ title: '操作失败', icon: 'none' });
-        },
-      });
-  },
-
-  tryCompleteOrder() {
-    const { order } = this.data;
-    if (order.status !== 'active') return;
-    if (
-      !order.returnImage ||
-      !order.borrowerReturnOk ||
-      !order.publisherReturnOk
-    ) {
-      return;
-    }
-    wx.showLoading({ title: '结束订单' });
-    db.collection('orders')
-      .doc(this.data.orderId)
-      .update({
-        data: { status: 'done' },
-        success: () => {
-          this.invokeSettleRent(() => {
+          this.fetchOrder((order) => {
             wx.hideLoading();
-            wx.setNavigationBarTitle({ title: '归还成功' });
-            this.setData({
-              showReturnSuccess: true,
-              'order.status': 'done',
-              'order.payStatus': 'settled',
-              statusText: STATUS_TEXT.done,
-              payStatusText: PAY_STATUS_TEXT.settled,
-              stepStates: this.computeStepStates('done'),
-            });
+            this.tryCompleteOrder(order);
           });
         },
         fail: () => {
@@ -351,9 +350,47 @@ Page({
       });
   },
 
-  invokeSettleRent(done) {
-    const { order } = this.data;
-    if (order.payStatus !== 'paid') {
+  tryCompleteOrder(order) {
+    const o = order || this.data.order;
+    if (!o || o.status !== 'active' || !this.canComplete(o)) return;
+    if (this._advancing) return;
+    this._advancing = true;
+
+    wx.showLoading({ title: '结束订单' });
+    db.collection('orders')
+      .doc(this.data.orderId)
+      .update({
+        data: { status: 'done' },
+        success: () => {
+          this.invokeSettleRent(o, () => {
+            this._advancing = false;
+            wx.hideLoading();
+            wx.setNavigationBarTitle({ title: '归还成功' });
+            this.setData({
+              showReturnSuccess: true,
+              'order.status': 'done',
+              'order.payStatus': o.payStatus === 'paid' ? 'settled' : o.payStatus,
+              statusText: STATUS_TEXT.done,
+              payStatusText:
+                o.payStatus === 'paid' ? PAY_STATUS_TEXT.settled : PAY_STATUS_TEXT[o.payStatus],
+              stepStates: this.computeStepStates('done'),
+            });
+          });
+        },
+        fail: () => {
+          this._advancing = false;
+          wx.hideLoading();
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        },
+      });
+  },
+
+  invokeSettleRent(order, done) {
+    if (typeof order === 'function') {
+      done = order;
+      order = this.data.order;
+    }
+    if (!order || order.payStatus !== 'paid') {
       if (typeof done === 'function') done();
       return;
     }

@@ -1,0 +1,50 @@
+<view class="container" wx:if="{{!loading}}">
+  <image class="hero-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+  <view class="hero-placeholder" wx:else>暂无图片</view>
+
+  <view class="card notify-card" wx:if="{{notifySummary}}">
+    <view class="card-label">通知摘要</view>
+    <text class="notify-type">{{notifySummary.typeText}}</text>
+    <text class="notify-from" wx:if="{{notifySummary.fromNickname}}">来自 {{notifySummary.fromNickname}}</text>
+    <text class="notify-content">{{notifySummary.content}}</text>
+  </view>
+
+  <view class="card">
+    <view class="title-row">
+      <text class="title">{{item.title}}</text>
+      <text class="tag" wx:if="{{item.category}}">{{item.category}}</text>
+    </view>
+    <view class="price-row">
+      <text class="rent">日租 ¥{{item.rentPrice}}/天</text>
+      <text class="deposit">押金 ¥{{item.deposit || 0}}</text>
+    </view>
+    <view class="desc-block" wx:if="{{item.description}}">
+      <text class="desc-label">物品说明</text>
+      <text class="desc-text">{{item.description}}</text>
+    </view>
+    <view class="contact-line" wx:if="{{item.contactWechat || item.contactQQ}}">
+      <text wx:if="{{item.contactWechat}}">微信 {{item.contactWechat}}</text>
+      <text wx:if="{{item.contactQQ}}">QQ {{item.contactQQ}}</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{orderInfo}}">
+    <view class="card-label">关联租借</view>
+    <view class="info-line">物品：{{orderInfo.itemTitle}}</view>
+    <view class="info-line">租期：{{orderInfo.startDate}} 至 {{orderInfo.endDate}}</view>
+    <view class="info-line" wx:if="{{orderInfo.rentTotal}}">租金：¥{{orderInfo.rentTotal}}</view>
+    <view class="info-line">状态：{{orderInfo.statusText}}</view>
+    <button class="link-btn" bindtap="goToOrder" wx:if="{{orderInfo._id}}">查看订单详情 ›</button>
+  </view>
+
+  <view class="action-area">
+    <button class="action-btn primary" bindtap="goToDetail">
+      {{isOwner ? '查看详情与评论' : '查看详情并预约'}}
+    </button>
+    <text class="owner-tip" wx:if="{{isOwner}}">这是你发布的物品，详情页不显示预约入口</text>
+  </view>
+</view>
+
+<view class="loading-wrap" wx:if="{{loading}}">
+  <text>加载中…</text>
+</view>
