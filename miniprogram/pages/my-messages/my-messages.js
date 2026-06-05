@@ -41,6 +41,9 @@ Page({
   },
 
   typeText(type) {
+    if (type === 'order_new') return '新预约';
+    if (type === 'order_accepted') return '预约已接受';
+    if (type === 'order_rejected') return '预约已拒绝';
     if (type === 'reply') return '回复了您的评论';
     if (type === 'item_reply') return '在您的物品下回复';
     return '在您的物品下留言';

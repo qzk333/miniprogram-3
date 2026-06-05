@@ -21,9 +21,12 @@ Page({
     app.globalData.pendingOrderTip = null;
 
     const dateRange = `${tip.startDate} 至 ${tip.endDate}`;
+    const confirmHint = tip.awaitingConfirm
+      ? '已通知出借方，请等待对方确认预约。'
+      : '面交时请打开底部「我的租借」完成租金托管与交接。';
     wx.showModal({
       title: '预约成功',
-      content: `「${tip.itemTitle}」\n${dateRange}\n\n面交时请打开底部「我的租借」上传凭证并确认交接。`,
+      content: `「${tip.itemTitle}」\n${dateRange}\n\n${confirmHint}`,
       confirmText: '我的租借',
       cancelText: '继续逛逛',
       success: (res) => {

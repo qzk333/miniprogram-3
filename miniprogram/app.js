@@ -62,7 +62,7 @@ App({
           : { publisherOpenid: openid };
         return db
           .collection('orders')
-          .where(_.and([cond, { status: _.in(['pending', 'active']) }]))
+          .where(_.and([cond, { status: _.in(['awaiting_confirm', 'pending', 'active']) }]))
           .count();
       })
       .then((res) => res.total)
