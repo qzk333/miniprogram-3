@@ -242,3 +242,71 @@
   margin-bottom: 12rpx;
   padding-bottom: 8rpx;
 }
+
+.role-row {
+  margin-top: 8rpx;
+}
+
+.role-badge {
+  display: inline-block;
+  font-size: 24rpx;
+  color: #00561F;
+  background: #e8f5e9;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.guest-tip {
+  font-size: 24rpx;
+  color: #e53e3e;
+  margin-top: 8rpx;
+}
+
+.wait-tip {
+  font-size: 26rpx;
+  color: #718096;
+  padding: 16rpx 0;
+}
+
+.confirm-done {
+  font-size: 28rpx;
+  color: #00561F;
+  padding: 16rpx 0;
+  font-weight: 500;
+}
+
+.pending-hint {
+  font-size: 24rpx;
+  color: #f59e0b;
+  margin-top: 12rpx;
+}
+
+.settle-tip {
+  font-size: 26rpx;
+  color: #00561F;
+  margin-bottom: 20rpx;
+}
+
+.pay-card {
+  border: 2rpx solid #e8f5e9;
+}
+
+.pay-amount {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #00561F;
+  margin: 16rpx 0;
+}
+
+.pay-status-tag {
+  font-size: 24rpx;
+  color: #718096;
+}
+
+.pay-status-tag.paid {
+  color: #00561F;
+}
+
+.pay-status-tag.settled {
+  color: #2d8a4e;
+}

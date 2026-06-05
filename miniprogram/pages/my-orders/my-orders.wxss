@@ -145,6 +145,12 @@ page {
   line-height: 1.5;
 }
 
+.order-rent {
+  font-size: 26rpx;
+  color: #00561F;
+  font-weight: 500;
+}
+
 .status-tag {
   flex-shrink: 0;
   font-size: 22rpx;

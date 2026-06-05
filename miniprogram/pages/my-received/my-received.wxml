@@ -9,6 +9,7 @@
     <view class="order-info">
       <text class="order-title">{{item.itemTitle}}</text>
       <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
+      <text class="order-rent" wx:if="{{item.rentTotal}}">租金 ¥{{item.rentTotal}}</text>
       <text class="order-role">他人预约 · 待你配合面交/归还</text>
     </view>
     <view class="order-right">
