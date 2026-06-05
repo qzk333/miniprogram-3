@@ -63,6 +63,65 @@ function pushCommentNotifications({
   return Promise.all(tasks).catch(() => {});
 }
 
+function pushOrderNotification({ order, borrowerNickname }) {
+  const publisherOpenid = order.publisherOpenid || '';
+  if (!publisherOpenid) return Promise.resolve();
+
+  const preview = `${borrowerNickname || '有人'}预约了「${order.itemTitle || '物品'}」${order.startDate} 至 ${order.endDate}`;
+
+  return db
+    .collection('notifications')
+    .add({
+      data: {
+        recipientOpenid: publisherOpenid,
+        type: 'order_new',
+        itemId: order.itemId || '',
+        itemTitle: order.itemTitle || '物品',
+        orderId: order._id || '',
+        content: preview,
+        fromOpenid: order.borrowerOpenid || '',
+        fromNickname: borrowerNickname || '微信用户',
+        isRead: false,
+        createTime: db.serverDate(),
+      },
+    })
+    .catch(() => {});
+}
+
+function pushBookingStatusNotification({
+  order,
+  recipientOpenid,
+  type,
+  fromNickname,
+}) {
+  if (!recipientOpenid) return Promise.resolve();
+
+  const textMap = {
+    order_accepted: `你的预约「${order.itemTitle}」已被出借方接受`,
+    order_rejected: `你的预约「${order.itemTitle}」已被出借方拒绝`,
+  };
+
+  return db
+    .collection('notifications')
+    .add({
+      data: {
+        recipientOpenid,
+        type,
+        itemId: order.itemId || '',
+        itemTitle: order.itemTitle || '物品',
+        orderId: order._id || '',
+        content: textMap[type] || '预约状态已更新',
+        fromOpenid: order.publisherOpenid || '',
+        fromNickname: fromNickname || '出借方',
+        isRead: false,
+        createTime: db.serverDate(),
+      },
+    })
+    .catch(() => {});
+}
+
 module.exports = {
   pushCommentNotifications,
+  pushOrderNotification,
+  pushBookingStatusNotification,
 };

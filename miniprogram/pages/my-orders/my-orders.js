@@ -1,7 +1,7 @@
 const db = wx.cloud.database();
 const { computeNextReminder } = require('../../utils/orderReminder');
 
-const STATUS_SORT = { active: 0, pending: 1, done: 2 };
+const STATUS_SORT = { active: 0, pending: 1, awaiting_confirm: 2, done: 3 };
 
 function sortOrdersByStatus(orders) {
   return [...orders].sort((a, b) => {
@@ -100,7 +100,7 @@ Page({
       });
     }
 
-    const isPending = status === 'pending';
+    const isPending = status === 'pending' || status === 'awaiting_confirm';
     wx.showModal({
       title: isPending ? '取消预约' : '删除记录',
       content: isPending

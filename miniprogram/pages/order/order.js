@@ -1,12 +1,14 @@
 const db = wx.cloud.database();
 
 const STATUS_TITLE = {
+  awaiting_confirm: '待确认',
   pending: '待面交',
   active: '借用中',
   done: '已完成',
 };
 
 const STATUS_TEXT = {
+  awaiting_confirm: '等待出借方确认',
   pending: '待面交',
   active: '借用中',
   done: '已归还',
@@ -200,6 +202,7 @@ Page({
 
   computeStepStates(status) {
     const map = {
+      awaiting_confirm: ['current', '', '', ''],
       pending: ['done', 'current', '', ''],
       active: ['done', 'done', 'current', ''],
       done: ['done', 'done', 'done', 'done'],
@@ -359,6 +362,54 @@ Page({
       data: { orderId: this.data.orderId },
       complete: () => {
         if (typeof done === 'function') done();
+      },
+    });
+  },
+
+  acceptBooking() {
+    this.respondBooking('accept');
+  },
+
+  rejectBooking() {
+    this.respondBooking('reject');
+  },
+
+  respondBooking(action) {
+    if (!this.data.isPublisher) return;
+    const title = this.data.order.itemTitle || '该物品';
+    const isAccept = action === 'accept';
+    wx.showModal({
+      title: isAccept ? '接受预约' : '拒绝预约',
+      content: isAccept
+        ? `确定接受「${title}」的预约？`
+        : `确定拒绝「${title}」的预约？`,
+      confirmColor: isAccept ? '#00561F' : '#E53E3E',
+      success: (res) => {
+        if (!res.confirm) return;
+        wx.showLoading({ title: '处理中' });
+        wx.cloud.callFunction({
+          name: 'respondBooking',
+          data: { orderId: this.data.orderId, action },
+          success: (cfRes) => {
+            wx.hideLoading();
+            const result = cfRes.result || {};
+            if (result.success) {
+              wx.showToast({
+                title: isAccept ? '已接受' : '已拒绝',
+                icon: 'success',
+              });
+              if (isAccept) this.fetchOrder();
+              else wx.navigateBack();
+              getApp().refreshMineTabBadge();
+            } else {
+              wx.showToast({ title: result.errMsg || '操作失败', icon: 'none' });
+            }
+          },
+          fail: () => {
+            wx.hideLoading();
+            wx.showToast({ title: '服务不可用', icon: 'none' });
+          },
+        });
       },
     });
   },

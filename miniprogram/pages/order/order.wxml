@@ -37,6 +37,18 @@
       </view>
     </view>
 
+    <!-- 等待出借方确认 -->
+    <view class="action-card" wx:if="{{order.status == 'awaiting_confirm'}}">
+      <view class="step-title">等待确认</view>
+      <view class="desc" wx:if="{{isBorrower}}">预约已提交，请等待出借方接受。接受后可进行租金托管与面交。</view>
+      <view class="desc" wx:elif="{{isPublisher}}">借方已提交预约，请确认是否接受。</view>
+      <view class="desc" wx:else>预约等待出借方确认中。</view>
+      <view class="received-actions" wx:if="{{isPublisher}}">
+        <button class="card-btn primary" bindtap="acceptBooking">接受预约</button>
+        <button class="card-btn reject-outline" bindtap="rejectBooking">拒绝预约</button>
+      </view>
+    </view>
+
     <!-- 租金托管 -->
     <view class="action-card pay-card" wx:if="{{order.status == 'pending' && isBorrower}}">
       <view class="step-title">租金托管</view>

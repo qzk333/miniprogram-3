@@ -1,5 +1,5 @@
 const db = wx.cloud.database();
-const { pushCommentNotifications } = require('../../utils/notify');
+const { pushCommentNotifications, pushOrderNotification } = require('../../utils/notify');
 const MAX_COMMENT_LEN = 200;
 
 Page({
@@ -387,19 +387,38 @@ Page({
           publisherHandoverOk: false,
           borrowerReturnOk: false,
           publisherReturnOk: false,
-          status: 'pending',
+          status: 'awaiting_confirm',
           createTime: db.serverDate(),
         },
         success: (res) => {
           wx.hideLoading();
           const app = getApp();
-          app.globalData.pendingOrderTip = {
-            orderId: res._id,
+          const orderId = res._id;
+          const orderPayload = {
+            _id: orderId,
+            itemId: item._id,
             itemTitle: item.title,
             startDate: this.data.startDate,
             endDate: this.data.endDate,
+            borrowerOpenid: app.globalData.openid,
+            publisherOpenid: item.publisherOpenid || '',
           };
-          app.globalData.highlightOrderId = res._id;
+          const nickname =
+            (app.globalData.userInfo && app.globalData.userInfo.nickName) ||
+            '微信用户';
+          pushOrderNotification({
+            order: orderPayload,
+            borrowerNickname: nickname,
+          }).then(() => app.refreshMineTabBadge());
+
+          app.globalData.pendingOrderTip = {
+            orderId,
+            itemTitle: item.title,
+            startDate: this.data.startDate,
+            endDate: this.data.endDate,
+            awaitingConfirm: true,
+          };
+          app.globalData.highlightOrderId = orderId;
           wx.switchTab({ url: '/pages/index/index' });
         },
         fail: () => {

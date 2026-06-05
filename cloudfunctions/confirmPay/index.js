@@ -21,8 +21,8 @@ exports.main = async (event) => {
     if (order.borrowerOpenid !== OPENID) {
       return { success: false, errMsg: '仅借方可支付租金' };
     }
-    if (!['pending', 'awaiting_confirm'].includes(order.status)) {
-      return { success: false, errMsg: '当前状态不可支付' };
+    if (order.status !== 'pending') {
+      return { success: false, errMsg: '请等待出借方确认预约后再支付' };
     }
     if (order.payStatus === 'paid' || order.payStatus === 'settled') {
       return { success: false, errMsg: '租金已支付' };

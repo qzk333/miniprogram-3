@@ -62,7 +62,7 @@
 
         <view class="status-tag {{item.status}}">
 
-          {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束')}}
+          {{item.status === 'awaiting_confirm' ? '待确认' : (item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束'))}}
 
         </view>
 
@@ -86,6 +86,18 @@
 
           <button
 
+            wx:elif="{{item.status === 'awaiting_confirm'}}"
+
+            class="action-btn muted"
+
+            catchtap="goToOrder"
+
+            data-id="{{item._id}}"
+
+          >查看</button>
+
+          <button
+
             wx:elif="{{item.status === 'active'}}"
 
             class="action-btn"
@@ -104,7 +116,7 @@
 
           <button
 
-            wx:if="{{item.status === 'pending'}}"
+            wx:if="{{item.status === 'pending' || item.status === 'awaiting_confirm'}}"
 
             class="delete-btn"
 

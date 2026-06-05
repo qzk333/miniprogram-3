@@ -160,6 +160,16 @@ page {
   margin-top: 4rpx;
 }
 
+.status-tag.awaiting_confirm {
+  background: #EBF8FF;
+  color: #3182CE;
+}
+
+.status-tag.awaiting_confirm {
+  background: #ebf8ff;
+  color: #3182ce;
+}
+
 .status-tag.pending {
   background: #FFF8E1;
   color: #F59E0B;

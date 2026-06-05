@@ -310,3 +310,15 @@
 .pay-status-tag.settled {
   color: #2d8a4e;
 }
+
+.received-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.reject-outline {
+  background: #fff !important;
+  color: #e53e3e !important;
+  border: 2rpx solid #fed7d7 !important;
+}
