@@ -13,6 +13,10 @@ Page({
     getApp().refreshMineTabBadge();
   },
 
+  onPullDownRefresh() {
+    this.fetchItems(() => wx.stopPullDownRefresh());
+  },
+
   /** 预约成功后从详情返回首页时弹出一次性引导 */
   showPendingOrderTip() {
     const app = getApp();
@@ -39,7 +43,7 @@ Page({
       },
     });
   },
-  fetchItems() {
+  fetchItems(done) {
     wx.showLoading({ title: '加载中' });
     db.collection('items')
       .orderBy('createTime', 'desc')
@@ -48,11 +52,13 @@ Page({
           wx.hideLoading();
           this.setData({ allItems: res.data }, () => {
             this.applyFilter();
+            if (typeof done === 'function') done();
           });
         },
         fail: () => {
           wx.hideLoading();
           wx.showToast({ title: '加载失败，请下拉重试', icon: 'none' });
+          if (typeof done === 'function') done();
         },
       });
   },

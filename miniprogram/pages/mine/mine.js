@@ -255,6 +255,19 @@ Page({
     });
   },
 
+  isCodeExpired(codeSentAt) {
+    if (!codeSentAt) return false;
+    let sent = codeSentAt;
+    if (sent && typeof sent === 'object' && sent.$date) {
+      sent = new Date(sent.$date);
+    } else if (!(sent instanceof Date)) {
+      sent = new Date(sent);
+    }
+    const sentMs = sent.getTime();
+    if (Number.isNaN(sentMs)) return false;
+    return Date.now() - sentMs > 5 * 60 * 1000;
+  },
+
   verifyCode() {
     if (!this.data.code || this.data.code.length !== 6)
       return wx.showToast({ title: '请输入6位验证码', icon: 'none' });
@@ -265,8 +278,11 @@ Page({
       .get({
         success: (userRes) => {
           const storedCode = userRes.data.code;
-          // 从数据库读取保存的邮箱（而非 this.data.email，避免切页丢失）
           const storedEmail = userRes.data.email;
+
+          if (this.isCodeExpired(userRes.data.codeSentAt)) {
+            return wx.showToast({ title: '验证码已过期，请重新获取', icon: 'none' });
+          }
 
           if (storedCode === this.data.code) {
             db.collection('users').doc(openid).update({

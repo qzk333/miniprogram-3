@@ -1,4 +1,14 @@
 <view class="container">
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{activeFilter === item.key ? 'active' : ''}}"
+      wx:for="{{filterTabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onFilterTap"
+    >{{item.label}}</view>
+  </view>
+
   <view class="order-card" wx:for="{{orderList}}" wx:key="_id">
     <view class="order-main" bindtap="goToOrder" data-id="{{item._id}}">
       <view class="order-info">
@@ -33,7 +43,7 @@
   </view>
 
   <view class="empty" wx:if="{{isEmpty}}">
-    <text class="empty-text">还没有人预约你的物品</text>
+    <text class="empty-text">{{activeFilter === 'all' ? '还没有人预约你的物品' : '该分类下暂无订单'}}</text>
     <button class="empty-btn" bindtap="goToPublish">去发布</button>
   </view>
 </view>

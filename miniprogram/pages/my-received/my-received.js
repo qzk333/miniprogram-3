@@ -1,9 +1,28 @@
 const db = wx.cloud.database();
 
+const FILTER_TABS = [
+  { key: 'all', label: '全部' },
+  { key: 'pending_action', label: '待处理' },
+  { key: 'ongoing', label: '进行中' },
+  { key: 'done', label: '已完成' },
+];
+
+function matchFilter(order, filterKey) {
+  const status = order.status;
+  if (filterKey === 'all') return true;
+  if (filterKey === 'pending_action') return status === 'awaiting_confirm';
+  if (filterKey === 'ongoing') return status === 'pending' || status === 'active';
+  if (filterKey === 'done') return status === 'done';
+  return true;
+}
+
 Page({
   data: {
     orderList: [],
+    allOrders: [],
     isEmpty: false,
+    filterTabs: FILTER_TABS,
+    activeFilter: 'all',
   },
 
   onShow() {
@@ -11,10 +30,30 @@ Page({
     getApp().refreshMineTabBadge();
   },
 
-  fetchReceivedOrders() {
+  onPullDownRefresh() {
+    this.fetchReceivedOrders(() => wx.stopPullDownRefresh());
+  },
+
+  onFilterTap(e) {
+    const key = e.currentTarget.dataset.key;
+    if (!key || key === this.data.activeFilter) return;
+    this.setData({ activeFilter: key }, () => this.applyFilter());
+  },
+
+  applyFilter() {
+    const { allOrders, activeFilter } = this.data;
+    const orderList = allOrders.filter((o) => matchFilter(o, activeFilter));
+    this.setData({
+      orderList,
+      isEmpty: orderList.length === 0,
+    });
+  },
+
+  fetchReceivedOrders(done) {
     const openid = getApp().globalData.openid;
     if (!openid) {
-      this.setData({ orderList: [], isEmpty: true });
+      this.setData({ orderList: [], allOrders: [], isEmpty: true });
+      if (typeof done === 'function') done();
       return;
     }
     const _ = db.command;
@@ -32,25 +71,16 @@ Page({
       })
       .then((res) => {
         wx.hideLoading();
-        this.setData({
-          orderList: res.data,
-          isEmpty: res.data.length === 0,
+        this.setData({ allOrders: res.data }, () => {
+          this.applyFilter();
+          if (typeof done === 'function') done();
         });
       })
       .catch(() => {
         wx.hideLoading();
         wx.showToast({ title: '加载失败', icon: 'none' });
+        if (typeof done === 'function') done();
       });
-  },
-
-  statusLabel(status) {
-    const map = {
-      awaiting_confirm: '待确认',
-      pending: '待面交',
-      active: '借用中',
-      done: '已结束',
-    };
-    return map[status] || status;
   },
 
   goToOrder(e) {

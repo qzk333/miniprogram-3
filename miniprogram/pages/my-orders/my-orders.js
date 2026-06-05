@@ -23,6 +23,14 @@ Page({
     nextReminder: null,
   },
 
+  onPullDownRefresh() {
+    if (!getApp().globalData.isLoggedIn) {
+      wx.stopPullDownRefresh();
+      return;
+    }
+    this.fetchMyOrders(() => wx.stopPullDownRefresh());
+  },
+
   onShow() {
     const app = getApp();
     this.setData({ isLoggedIn: app.globalData.isLoggedIn });
@@ -46,10 +54,11 @@ Page({
     wx.switchTab({ url: '/pages/mine/mine' });
   },
 
-  fetchMyOrders() {
+  fetchMyOrders(done) {
     const openid = getApp().globalData.openid;
     if (!openid) {
       this.setData({ orderList: [], isEmpty: true, nextReminder: null });
+      if (typeof done === 'function') done();
       return;
     }
     wx.showLoading({ title: '加载中' });
@@ -65,10 +74,12 @@ Page({
           isEmpty: orderList.length === 0,
           nextReminder: computeNextReminder(orderList),
         });
+        if (typeof done === 'function') done();
       })
       .catch(() => {
         wx.hideLoading();
         wx.showToast({ title: '加载失败', icon: 'none' });
+        if (typeof done === 'function') done();
       });
   },
 

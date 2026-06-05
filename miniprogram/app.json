@@ -30,14 +30,14 @@
       {
         "pagePath": "pages/my-orders/my-orders",
         "text": "我的租借",
-        "iconPath": "images/examples.png",
-        "selectedIconPath": "images/examples-active.png"
+        "iconPath": "images/goods.png",
+        "selectedIconPath": "images/goods-active.png"
       },
       {
         "pagePath": "pages/my-publish/my-publish",
         "text": "我的发布",
-        "iconPath": "images/examples.png",
-        "selectedIconPath": "images/examples-active.png"
+        "iconPath": "images/business.png",
+        "selectedIconPath": "images/business-active.png"
       },
       {
         "pagePath": "pages/mine/mine",
