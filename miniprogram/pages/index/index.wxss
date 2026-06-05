@@ -265,3 +265,14 @@ page {
   font-size: 26rpx;
   color: #aaa;
 }
+
+.empty-publish-btn {
+  margin-top: 40rpx;
+  width: 240rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: #00561F;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}

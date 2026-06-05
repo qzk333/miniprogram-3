@@ -59,6 +59,24 @@
   border-bottom: none; /* 最后一项去掉下划线 */
 }
 
+.form-item.textarea-item {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24rpx 0;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  margin-top: 16rpx;
+  padding: 16rpx;
+  font-size: 28rpx;
+  color: #1A202C;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+}
+
 /* 左侧标签：固定宽度，使右侧输入区域在垂直方向上完美对齐 */
 .form-label {
   font-size: 28rpx;

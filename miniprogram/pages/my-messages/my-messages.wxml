@@ -1,0 +1,45 @@
+<view class="page-wrapper">
+  <image class="bg-image" src="/images/sysu1.jpg" mode="aspectFill"></image>
+  <view class="bg-overlay"></view>
+
+  <view class="container">
+    <view class="page-header" wx:if="{{list.length > 0}}">
+      <text class="page-header-title">收到 {{list.length}} 条私信</text>
+    </view>
+
+    <view
+      class="list-card {{item.isRead ? '' : 'unread'}}"
+      wx:for="{{list}}"
+      wx:key="_id"
+      bindtap="goToItemPreview"
+      data-item-id="{{item.itemId}}"
+      data-order-id="{{item.orderId}}"
+      data-notify-type="{{item.type}}"
+      data-from-nickname="{{item.fromNickname}}"
+      data-content="{{item.content}}"
+    >
+      <view class="list-main">
+        <view class="list-icon-wrap">
+          <text class="list-icon">✉</text>
+        </view>
+        <view class="list-info">
+          <view class="list-title-row">
+            <text class="list-title">{{item.fromNickname}}</text>
+            <text class="list-tag">{{item.typeText}}</text>
+          </view>
+          <text class="list-meta">物品：{{item.itemTitle}}</text>
+          <text class="list-desc">{{item.content}}</text>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+      <view class="list-footer">
+        <text class="list-link">查看物品概览</text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{isEmpty}}">
+      <text class="empty-text">暂无收到的私信</text>
+      <text class="empty-sub">他人在您发布的物品下留言或回复评论时会出现在这里</text>
+    </view>
+  </view>
+</view>

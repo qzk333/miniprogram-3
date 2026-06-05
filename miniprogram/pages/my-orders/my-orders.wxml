@@ -1,19 +1,172 @@
-<view class="container">
-  <view class="order-card" wx:for="{{orderList}}" wx:key="_id" bindtap="goToOrder" data-id="{{item._id}}">
-    <view class="order-info">
-      <text class="order-title">{{item.itemTitle}}</text>
-      <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
-    </view>
-    <view class="order-right">
-      <view class="status-tag {{item.status}}">
-        {{item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已归还')}}
-      </view>
-      <view class="arrow">›</view>
-    </view>
+<view class="page-wrapper">
+
+  <image class="bg-image" src="/images/sysu1.jpg" mode="aspectFill"></image>
+
+  <view class="bg-overlay"></view>
+
+
+
+  <view class="container">
+
+  <view class="login-tip-card" wx:if="{{!isLoggedIn}}">
+
+    <text class="login-tip-text">登录后查看租借记录与到期提醒</text>
+
+    <button class="login-tip-btn" bindtap="goLogin">去登录</button>
+
   </view>
 
-  <view class="empty" wx:if="{{isEmpty}}">
-    <text class="empty-text">还没有租借记录</text>
-    <button class="empty-btn" bindtap="goToIndex">去逛逛</button>
+
+
+  <block wx:else>
+
+    <view class="reminder-card" wx:if="{{nextReminder}}" bindtap="goToReminderOrder">
+
+      <view class="reminder-label">最近待办</view>
+
+      <text class="reminder-text">{{nextReminder.reminderText}}</text>
+
+      <text class="reminder-action">去处理 ›</text>
+
+    </view>
+
+
+
+    <view class="page-header" wx:if="{{orderList.length > 0}}">
+      <text class="page-header-title">全部租借记录</text>
+    </view>
+
+
+
+    <view
+
+      class="order-card {{highlightOrderId === item._id ? 'highlight' : ''}}"
+
+      wx:for="{{orderList}}"
+
+      wx:key="_id"
+
+    >
+
+      <view class="order-main" bindtap="goToOrder" data-id="{{item._id}}">
+
+        <view class="order-info">
+
+          <text class="order-title">{{item.itemTitle}}</text>
+
+          <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
+
+          <text class="order-rent" wx:if="{{item.rentTotal}}">租金 ¥{{item.rentTotal}}</text>
+
+        </view>
+
+        <view class="status-tag {{item.status}}">
+
+          {{item.status === 'awaiting_confirm' ? '待确认' : (item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束'))}}
+
+        </view>
+
+      </view>
+
+      <view class="order-actions">
+
+        <view class="action-slot">
+
+          <button
+
+            wx:if="{{item.status === 'pending'}}"
+
+            class="action-btn"
+
+            catchtap="goToOrder"
+
+            data-id="{{item._id}}"
+
+          >去面交</button>
+
+          <button
+
+            wx:elif="{{item.status === 'awaiting_confirm'}}"
+
+            class="action-btn muted"
+
+            catchtap="goToOrder"
+
+            data-id="{{item._id}}"
+
+          >查看</button>
+
+          <button
+
+            wx:elif="{{item.status === 'active'}}"
+
+            class="action-btn"
+
+            catchtap="goToOrder"
+
+            data-id="{{item._id}}"
+
+          >去归还</button>
+
+          <view wx:else class="action-placeholder">—</view>
+
+        </view>
+
+        <view class="action-slot">
+
+          <button
+
+            wx:if="{{item.status === 'pending' || item.status === 'awaiting_confirm'}}"
+
+            class="delete-btn"
+
+            catchtap="deleteOrder"
+
+            data-id="{{item._id}}"
+
+            data-status="{{item.status}}"
+
+            data-title="{{item.itemTitle}}"
+
+          >取消</button>
+
+          <button
+
+            wx:elif="{{item.status === 'done'}}"
+
+            class="delete-btn"
+
+            catchtap="deleteOrder"
+
+            data-id="{{item._id}}"
+
+            data-status="{{item.status}}"
+
+            data-title="{{item.itemTitle}}"
+
+          >删除</button>
+
+          <view wx:else class="action-placeholder">—</view>
+
+        </view>
+
+      </view>
+
+    </view>
+
+
+
+    <view class="empty" wx:if="{{isEmpty}}">
+
+      <text class="empty-text">还没有租借记录</text>
+
+      <button class="empty-btn" bindtap="goToMarket">去市场逛逛</button>
+
+    </view>
+
+  </block>
+
   </view>
+
 </view>
+

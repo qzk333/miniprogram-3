@@ -1,16 +1,28 @@
-/* 物品信息卡片 */
-.info-card {
+/* 详情页铺满宽度，避免 global .container 居中导致卡片变窄 */
+.container {
+  width: 100%;
+  align-items: stretch;
+  padding-bottom: 48rpx;
+  box-sizing: border-box;
+}
+
+.page-card {
+  width: 100%;
+  box-sizing: border-box;
   background: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  border-radius: 16rpx;
+  border-radius: 0;
 }
+
 .header-img {
   width: 100%;
   height: 400rpx;
   background: #f0f0f0;
+  display: block;
 }
-.title {
+
+.info-card .title {
   font-size: 36rpx;
   font-weight: bold;
   margin-bottom: 16rpx;
@@ -18,19 +30,80 @@
 .price-wrap {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 16rpx;
   font-size: 28rpx;
   color: #333;
 }
-.deposit { margin-left: 30rpx; color: #666; }
+.deposit { color: #666; }
 .waived { text-decoration: line-through; color: #07c160; }
 
-/* ========== 日历卡片 ========== */
-.calendar-card {
-  background: #fff;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  border-radius: 16rpx;
+.desc-block {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
 }
+.desc-label {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+.desc-text {
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.6;
+}
+
+.owner-tip-card {
+  background: #f0faf4;
+  border-left: 6rpx solid #00561f;
+}
+
+.owner-tip-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #00561f;
+  margin-bottom: 8rpx;
+}
+
+.owner-tip-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #1A202C;
+  margin-bottom: 12rpx;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.contact-label {
+  width: 80rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+.contact-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+.copy-btn {
+  margin: 0 !important;
+  background: #00561F !important;
+  color: #fff !important;
+}
+
+/* ========== 日历 ========== */
 .cal-header {
   display: flex;
   justify-content: space-between;
@@ -47,7 +120,6 @@
   color: #007AFF;
 }
 
-/* 星期标题行 */
 .weekday-row {
   display: flex;
   margin-bottom: 10rpx;
@@ -64,7 +136,6 @@
   color: #E53E3E;
 }
 
-/* 日历网格 */
 .days-grid {
   display: flex;
   flex-wrap: wrap;
@@ -81,19 +152,19 @@
   border-radius: 10rpx;
   font-size: 26rpx;
   color: #333;
-  position: relative;
-}
-
-.empty-cell {
-  /* 空占位格不可见 */
 }
 
 .disabled {
-  color: #ccc;
+  background: #ececec;
+  border-color: #dcdcdc;
+  color: #8a8a8a;
 }
-
 .disabled .date-txt {
-  color: #ccc;
+  color: #8a8a8a;
+  font-weight: 500;
+}
+.disabled.weekend .date-txt {
+  color: #8a8a8a;
 }
 
 .selected {
@@ -102,24 +173,16 @@
   border-color: #00561F;
   font-weight: bold;
 }
-
 .selected .date-txt {
   color: #fff;
 }
-
 .weekend .date-txt {
   color: #E53E3E;
 }
-
 .selected.weekend .date-txt {
   color: #fff;
 }
 
-.date-txt {
-  line-height: 1;
-}
-
-/* 图例 */
 .cal-legend {
   display: flex;
   justify-content: center;
@@ -142,7 +205,6 @@
 .legend-dot.taken { background: #f0f0f0; border: 2rpx solid #e0e0e0; }
 .legend-dot.picked { background: #00561F; }
 
-/* 按钮 */
 .reset-btn {
   width: 100%;
   margin-top: 10rpx;
@@ -150,10 +212,241 @@
   background: #f5f5f5;
   border-radius: 12rpx;
 }
+
+.rent-estimate {
+  font-size: 26rpx;
+  color: #00561F;
+  background: rgba(0, 86, 31, 0.06);
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
 .book-btn {
   width: 90% !important;
-  margin: 40rpx auto;
+  margin: 20rpx auto 24rpx;
   border-radius: 40rpx;
+  background: #00561F !important;
+  color: #fff !important;
+}
+
+/* ========== 评论区 ========== */
+.comment-count {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.comment-list {
+  margin-bottom: 24rpx;
+}
+
+.comment-block {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.comment-block:last-child {
+  border-bottom: none;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 10rpx;
+}
+
+.comment-author {
+  font-size: 26rpx;
+  color: #2D3748;
+  font-weight: 600;
+}
+
+.publisher-badge {
+  font-size: 20rpx;
+  color: #fff;
+  background: linear-gradient(135deg, #00561F, #2d8a4e);
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.reply-to {
+  font-size: 22rpx;
+  color: #718096;
+}
+
+.reply-btn {
+  font-size: 24rpx;
+  color: #007AFF;
+  margin-left: auto;
+}
+
+.comment-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.55;
+  word-break: break-all;
+}
+
+.reply-list {
+  margin-top: 16rpx;
+  margin-left: 24rpx;
+  padding-left: 20rpx;
+  border-left: 4rpx solid rgba(0, 86, 31, 0.15);
+}
+
+.reply-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+.reply-item:last-child {
+  border-bottom: none;
+}
+
+.comment-empty {
+  font-size: 26rpx;
+  color: #999;
+  padding: 24rpx 0;
+  text-align: center;
+}
+
+.reply-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24rpx;
+  color: #00561F;
+  background: rgba(0, 86, 31, 0.06);
+  padding: 12rpx 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.cancel-reply {
+  color: #718096;
+  padding: 8rpx;
+}
+
+.comment-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.comment-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.comment-send {
+  margin: 0 !important;
+  flex-shrink: 0;
+  background: #00561F !important;
+  color: #fff !important;
+}
+
+/* ========== 预约确认弹层 ========== */
+.confirm-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  box-sizing: border-box;
+}
+
+.confirm-panel {
+  width: 100%;
+  max-width: 620rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 36rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.confirm-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1A202C;
+  text-align: center;
+}
+
+.confirm-subtitle {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+  margin: 12rpx 0 32rpx;
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.confirm-label {
+  font-size: 26rpx;
+  color: #718096;
+  flex-shrink: 0;
+}
+
+.confirm-value {
+  font-size: 28rpx;
+  color: #2D3748;
+  text-align: right;
+  flex: 1;
+}
+
+.confirm-value.highlight {
+  color: #00561F;
+  font-weight: 500;
+}
+
+.confirm-tip {
+  font-size: 22rpx;
+  color: #A0AEC0;
+  margin: 24rpx 0 32rpx;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.confirm-cancel,
+.confirm-ok {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  margin: 0;
+  padding: 0;
+}
+
+.confirm-cancel {
+  background: #f5f5f5 !important;
+  color: #666 !important;
+}
+
+.confirm-ok {
   background: #00561F !important;
   color: #fff !important;
 }

@@ -10,14 +10,17 @@ Page({
     isSending: false,
     publishedCount: 0,
     activeOrdersCount: 0,
+    receivedOrdersCount: 0,
+    unreadMessagesCount: 0,
   },
 
   onShow() {
     const app = getApp();
     const isLoggedIn = app.globalData.isLoggedIn;
     this.setData({ isLoggedIn });
+    // 进入「我的」后立即隐藏 Tab 红点（「收到的预约」数字角标仍保留）
+    app.hideMineTabRedDot();
     if (isLoggedIn) {
-      // 从数据库同步最新用户状态（头像、昵称、认证信息）
       this.syncUserFromCloud(app.globalData.openid);
     }
   },
@@ -46,8 +49,8 @@ Page({
     wx.setStorageSync('openid', openid);
     this.setData({ isLoggedIn: true });
 
-    // 从云端同步用户资料（新用户自动创建记录，老用户恢复头像昵称）
     this.syncUserFromCloud(openid);
+    getApp().refreshMineTabBadge();
   },
 
   /**
@@ -117,23 +120,55 @@ Page({
     db.collection('orders')
       .where({
         borrowerOpenid: openid,
-        status: _.in(['pending', 'active'])
+        status: _.in(['pending', 'active']),
       })
       .count()
-      .then(res => {
+      .then((res) => {
         this.setData({ activeOrdersCount: res.total });
+      })
+      .catch(() => {});
+    db.collection('items')
+      .where({ publisherOpenid: openid })
+      .field({ _id: true })
+      .get()
+      .then((itemsRes) => {
+        const itemIds = itemsRes.data.map((i) => i._id);
+        const cond = itemIds.length
+          ? _.or([{ publisherOpenid: openid }, { itemId: _.in(itemIds) }])
+          : { publisherOpenid: openid };
+        return db
+          .collection('orders')
+          .where(
+            _.and([cond, { status: _.in(['pending', 'active']) }])
+          )
+          .count();
+      })
+      .then((res) => {
+        const count = res.total;
+        this.setData({ receivedOrdersCount: count });
+        getApp().markReceivedBadgeSeen(count);
+      })
+      .catch(() => {});
+    getApp()
+      .fetchUnreadMessagesCount(openid)
+      .then((count) => {
+        this.setData({ unreadMessagesCount: count });
       })
       .catch(() => {});
   },
 
-  // 导航到我的发布
-  goToMyPublish() {
-    wx.navigateTo({ url: '/pages/my-publish/my-publish' });
+  goToMyReceived() {
+    const app = getApp();
+    app.requireLogin(() => {
+      wx.navigateTo({ url: '/pages/my-received/my-received' });
+    });
   },
 
-  // 导航到我的租借
-  goToMyOrders() {
-    wx.navigateTo({ url: '/pages/my-orders/my-orders' });
+  goToMyMessages() {
+    const app = getApp();
+    app.requireLogin(() => {
+      wx.navigateTo({ url: '/pages/my-messages/my-messages' });
+    });
   },
 
   // --- 头像和昵称编辑（新版微信 API） ---
@@ -219,6 +254,19 @@ Page({
     });
   },
 
+  isCodeExpired(codeSentAt) {
+    if (!codeSentAt) return false;
+    let sent = codeSentAt;
+    if (sent && typeof sent === 'object' && sent.$date) {
+      sent = new Date(sent.$date);
+    } else if (!(sent instanceof Date)) {
+      sent = new Date(sent);
+    }
+    const sentMs = sent.getTime();
+    if (Number.isNaN(sentMs)) return false;
+    return Date.now() - sentMs > 5 * 60 * 1000;
+  },
+
   verifyCode() {
     if (!this.data.code || this.data.code.length !== 6)
       return wx.showToast({ title: '请输入6位验证码', icon: 'none' });
@@ -229,8 +277,11 @@ Page({
       .get({
         success: (userRes) => {
           const storedCode = userRes.data.code;
-          // 从数据库读取保存的邮箱（而非 this.data.email，避免切页丢失）
           const storedEmail = userRes.data.email;
+
+          if (this.isCodeExpired(userRes.data.codeSentAt)) {
+            return wx.showToast({ title: '验证码已过期，请重新获取', icon: 'none' });
+          }
 
           if (storedCode === this.data.code) {
             db.collection('users').doc(openid).update({

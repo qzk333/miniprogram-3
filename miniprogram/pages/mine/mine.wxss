@@ -280,6 +280,20 @@
   font-size: 30rpx;
   color: #2D3748;
   font-weight: 500;
+  flex: 1;
+}
+
+.action-badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  padding: 0 10rpx;
+  margin-right: 16rpx;
+  font-size: 22rpx;
+  text-align: center;
+  color: #fff;
+  background: #E53E3E;
+  border-radius: 18rpx;
 }
 
 .action-arrow {
@@ -320,8 +334,9 @@
 
 /* ================= 邮箱认证输入 ================= */
 .input {
+  height: 90rpx;      /* 1. 显式指定高度，解决微信小程序 input 被 padding 挤压变形的问题 */
+  padding: 0 24rpx;   /* 2. 将上下 padding 改为 0，仅保留左右边距，文字会自动垂直居中 */
   border: 1rpx solid #E2E8F0;
-  padding: 24rpx;
   border-radius: 12rpx;
   margin-bottom: 24rpx;
   width: 100%;

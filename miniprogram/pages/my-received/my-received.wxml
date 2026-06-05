@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{activeFilter === item.key ? 'active' : ''}}"
+      wx:for="{{filterTabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onFilterTap"
+    >{{item.label}}</view>
+  </view>
+
+  <view class="order-card" wx:for="{{orderList}}" wx:key="_id">
+    <view class="order-main" bindtap="goToOrder" data-id="{{item._id}}">
+      <view class="order-info">
+        <text class="order-title">{{item.itemTitle}}</text>
+        <text class="order-date">{{item.startDate}} 至 {{item.endDate}}</text>
+        <text class="order-rent" wx:if="{{item.rentTotal}}">租金 ¥{{item.rentTotal}}</text>
+        <text class="order-role">他人预约 · 待你配合面交/归还</text>
+      </view>
+      <view class="order-right">
+        <view class="status-tag {{item.status}}">
+          {{item.status === 'awaiting_confirm' ? '待确认' : (item.status === 'pending' ? '待面交' : (item.status === 'active' ? '借用中' : '已结束'))}}
+        </view>
+        <view class="arrow">›</view>
+      </view>
+    </view>
+    <view class="received-actions" wx:if="{{item.status === 'awaiting_confirm'}}">
+      <button
+        class="action-btn accept-btn"
+        catchtap="respondBooking"
+        data-id="{{item._id}}"
+        data-action="accept"
+        data-title="{{item.itemTitle}}"
+      >接受</button>
+      <button
+        class="action-btn reject-btn"
+        catchtap="respondBooking"
+        data-id="{{item._id}}"
+        data-action="reject"
+        data-title="{{item.itemTitle}}"
+      >拒绝</button>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{isEmpty}}">
+    <text class="empty-text">{{activeFilter === 'all' ? '还没有人预约你的物品' : '该分类下暂无订单'}}</text>
+    <button class="empty-btn" bindtap="goToPublish">去发布</button>
+  </view>
+</view>

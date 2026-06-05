@@ -17,22 +17,28 @@ Page({
       '其他',
     ],
     imageUrl: '',
+    description: '',
+    contactWechat: '',
+    contactQQ: '',
   },
-  onShow() {
-    // 每次进入发布页时检查登录状态
-    const app = getApp();
-    if (!app.globalData.isLoggedIn) {
+  onLoad() {
+    if (!getApp().globalData.isLoggedIn) {
       wx.showModal({
         title: '请先登录',
         content: '发布物品需要先登录',
         confirmText: '去登录',
-        cancelText: '取消',
-        success: (res) => {
-          if (res.confirm) {
-            wx.switchTab({ url: '/pages/mine/mine' });
-          }
+        showCancel: false,
+        success: () => {
+          wx.switchTab({ url: '/pages/mine/mine' });
         },
       });
+    }
+  },
+
+  onShow() {
+    const app = getApp();
+    if (!app.globalData.isLoggedIn) {
+      return;
     }
   },
   inputTitle(e) {
@@ -43,6 +49,15 @@ Page({
   },
   inputDeposit(e) {
     this.setData({ deposit: e.detail.value });
+  },
+  inputDescription(e) {
+    this.setData({ description: e.detail.value });
+  },
+  inputWechat(e) {
+    this.setData({ contactWechat: e.detail.value });
+  },
+  inputQQ(e) {
+    this.setData({ contactQQ: e.detail.value });
   },
   onCategoryChange(e) {
     const index = e.detail.value;
@@ -79,14 +94,41 @@ Page({
   submitItem() {
     const app = getApp();
     app.requireLogin(() => {
-      this.doSubmitItem();
+      if (!this.validateForm()) return;
+      const rent = parseFloat(this.data.rentPrice);
+      const deposit = this.data.deposit ? parseFloat(this.data.deposit) : 0;
+      wx.showModal({
+        title: '确认发布',
+        content: `物品：${this.data.title}\n分类：${this.data.category}\n日租金：¥${rent}/天\n押金：¥${isNaN(deposit) ? 0 : deposit}`,
+        confirmText: '确认发布',
+        cancelText: '再想想',
+        success: (res) => {
+          if (res.confirm) this.doSubmitItem();
+        },
+      });
     });
   },
 
-  doSubmitItem() {
+  validateForm() {
     if (!this.data.title || !this.data.imageUrl) {
-      return wx.showToast({ title: '请完善信息', icon: 'none' });
+      wx.showToast({ title: '请填写名称并上传主图', icon: 'none' });
+      return false;
     }
+    const rent = parseFloat(this.data.rentPrice);
+    if (
+      this.data.rentPrice === '' ||
+      this.data.rentPrice === null ||
+      isNaN(rent) ||
+      rent < 0
+    ) {
+      wx.showToast({ title: '请填写日租金', icon: 'none' });
+      return false;
+    }
+    return true;
+  },
+
+  doSubmitItem() {
+    if (!this.validateForm()) return;
     const app = getApp();
     wx.showLoading({ title: '发布中' });
     db.collection('items').add({
@@ -96,15 +138,28 @@ Page({
         deposit: this.data.deposit,
         category: this.data.category,
         image: this.data.imageUrl,
+        description: this.data.description.trim(),
+        contactWechat: this.data.contactWechat.trim(),
+        contactQQ: this.data.contactQQ.trim(),
         publisherOpenid: app.globalData.openid,
         createTime: db.serverDate(),
       },
       success: () => {
         wx.hideLoading();
         wx.showToast({ title: '发布成功' });
-        this.setData({ title: '', rentPrice: '', deposit: '', category: '', imageUrl: '' });
+        this.setData({
+          title: '',
+          rentPrice: '',
+          deposit: '',
+          category: '数码电子',
+          categoryIndex: 0,
+          imageUrl: '',
+          description: '',
+          contactWechat: '',
+          contactQQ: '',
+        });
         setTimeout(() => {
-          wx.switchTab({ url: '/pages/index/index' });
+          wx.switchTab({ url: '/pages/my-publish/my-publish' });
         }, 1500);
       },
       fail: () => {

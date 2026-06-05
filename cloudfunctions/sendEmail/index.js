@@ -40,7 +40,8 @@ exports.main = async (event, context) => {
       await db.collection('users').doc(openid).update({
         data: {
           email: email,
-          code: code.toString()
+          code: code.toString(),
+          codeSentAt: db.serverDate(),
         }
       });
     } else {
@@ -52,6 +53,7 @@ exports.main = async (event, context) => {
           avatarUrl: '',
           email: email,
           code: code.toString(),
+          codeSentAt: db.serverDate(),
           isVerified: false,
           createTime: db.serverDate()
         }

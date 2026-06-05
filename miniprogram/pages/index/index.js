@@ -8,20 +8,63 @@ Page({
     searchText: ''
   },
   onShow() {
-    this.fetchItems()
+    this.fetchItems();
+    this.showPendingOrderTip();
+    getApp().refreshMineTabBadge();
   },
-  fetchItems() {
-    // 从云数据库拉取物品数据
-    db.collection('items').orderBy('createTime', 'desc').get({
-      success: res => {
-        this.setData({ allItems: res.data }, () => {
-          this.applyFilter();
-        });
+
+  onPullDownRefresh() {
+    this.fetchItems(() => wx.stopPullDownRefresh());
+  },
+
+  /** 预约成功后从详情返回首页时弹出一次性引导 */
+  showPendingOrderTip() {
+    const app = getApp();
+    const tip = app.globalData.pendingOrderTip;
+    if (!tip) return;
+    app.globalData.pendingOrderTip = null;
+
+    const dateRange = `${tip.startDate} 至 ${tip.endDate}`;
+    const confirmHint = tip.awaitingConfirm
+      ? '已通知出借方，请等待对方确认预约。'
+      : '面交时请打开底部「我的租借」完成租金托管与交接。';
+    wx.showModal({
+      title: '预约成功',
+      content: `「${tip.itemTitle}」\n${dateRange}\n\n${confirmHint}`,
+      confirmText: '我的租借',
+      cancelText: '继续逛逛',
+      success: (res) => {
+        if (res.confirm) {
+          if (tip.orderId) {
+            app.globalData.highlightOrderId = tip.orderId;
+          }
+          wx.switchTab({ url: '/pages/my-orders/my-orders' });
+        }
       },
-      fail: err => {
-        console.error('Fetch items failed', err);
-      }
-    })
+    });
+  },
+  fetchItems(done) {
+    wx.showLoading({ title: '加载中' });
+    db.collection('items')
+      .orderBy('createTime', 'desc')
+      .get({
+        success: (res) => {
+          wx.hideLoading();
+          this.setData({ allItems: res.data }, () => {
+            this.applyFilter();
+            if (typeof done === 'function') done();
+          });
+        },
+        fail: () => {
+          wx.hideLoading();
+          wx.showToast({ title: '加载失败，请下拉重试', icon: 'none' });
+          if (typeof done === 'function') done();
+        },
+      });
+  },
+
+  goToPublish() {
+    wx.switchTab({ url: '/pages/my-publish/my-publish' });
   },
   switchCategory(e) {
     const category = e.currentTarget.dataset.category;
